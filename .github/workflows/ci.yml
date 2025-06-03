@@ -1,13 +1,15 @@
 name: CI - Lint and Tests
 
 on:
+  push:
+    branches: ['**']
   pull_request:
-    types: [opened, synchronize, reopened]
+    branches: ['**']
 
 jobs:
   lint:
+    name: Run Linter
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -23,10 +25,10 @@ jobs:
       - name: Run linter
         run: npm run lint
 
-  test-unit:
-    if: github.base_ref == 'main'
+  unit-tests:
+    name: Run Unit Tests (only on main)
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -42,8 +44,9 @@ jobs:
       - name: Run unit tests
         run: npm run test
 
-  test-e2e:
-    if: github.base_ref == 'main'
+  e2e-tests:
+    name: Run E2E Tests (only on main)
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
 
     services:
