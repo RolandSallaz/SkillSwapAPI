@@ -1,13 +1,49 @@
-name: CI - Lint and Test on PR from dev to main
+name: CI - Lint and Tests
 
 on:
   pull_request:
-    branches: [main]
     types: [opened, synchronize, reopened]
 
 jobs:
-  lint-and-test:
-    if: github.head_ref == 'dev'
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: npm run lint
+
+  test-unit:
+    if: github.base_ref == 'main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests
+        run: npm run test
+
+  test-e2e:
+    if: github.base_ref == 'main'
     runs-on: ubuntu-latest
 
     services:
@@ -40,12 +76,6 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
-
-      - name: Run linter
-        run: npm run lint
-
-      - name: Run unit tests
-        run: npm run test
 
       - name: Run e2e tests
         run: npm run test:e2e
