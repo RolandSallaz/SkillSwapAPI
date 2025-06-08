@@ -1,12 +1,18 @@
 import { Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { UsersService } from '../users/users.service';
 import { UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
-  constructor(private usersService: UsersService) {}
+  constructor(
+    private usersService: UsersService,
+    private jwtService: JwtService,
+    private config: ConfigService,
+  ) {}
 
   register(registerDto: RegisterDto) {
     return {
@@ -21,12 +27,24 @@ export class AuthService {
   login(loginDto: LoginDto) {
     const user = this.usersService.findOne(loginDto.userId);
     if (!user) throw new UnauthorizedException('Пользователь не найден');
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const payload = { sub: user.id, username: user.name };
+
+    const accessToken = this.jwtService.sign(payload, {
+      secret: this.config.get('JWT_ACCESS_SECRET'),
+      expiresIn: this.config.get('JWT_ACCESS_EXPIRES_IN'),
+    });
+
+    const refreshToken = this.jwtService.sign(payload, {
+      secret: this.config.get('JWT_REFRESH_SECRET'),
+      expiresIn: this.config.get('JWT_REFRESH_EXPIRES_IN'),
+    });
     return {
       message:
         'Вход выполнен успешно, При входе должен сверяться переданный в body пароль с хешем из бд, если авторизация успешна, то отправляем jwt токен через куки',
-      user: loginDto.email,
-      accessToken: 'fake-accessToken',
-      refreshToken: 'fake-refreshToken',
+      accessToken,
+      refreshToken,
     };
   }
 
