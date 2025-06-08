@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateUsersDto } from './dto/create-users.dto';
 import { UpdateUsersDto } from './dto/update-users.dto';
 
+//Создание логики для работы с пользователями
 @Injectable()
 export class UsersService {
   create(createUsersDto: CreateUsersDto) {

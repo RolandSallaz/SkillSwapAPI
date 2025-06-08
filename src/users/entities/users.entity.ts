@@ -10,6 +10,7 @@ export enum UserRole {
   ADMIN = 'ADMIN',
 }
 
+//Данные пользователя для базы
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()

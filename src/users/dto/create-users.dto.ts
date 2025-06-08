@@ -17,6 +17,7 @@ export enum UserRole {
   ADMIN = 'ADMIN',
 }
 
+// DTO для создания пользователя при передачи данных через API
 export class CreateUsersDto {
   @IsString()
   @IsNotEmpty()
@@ -26,6 +27,7 @@ export class CreateUsersDto {
   email: string;
 
   @IsString()
+  @IsNotEmpty()
   password: string;
 
   @Min(10)
