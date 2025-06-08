@@ -9,7 +9,7 @@ interface JwtPayload {
 }
 
 @Injectable()
-export class accessTokenStrategy extends PassportStrategy(
+export class AccessTokenStrategy extends PassportStrategy(
   Strategy,
   'jwt-access',
 ) {

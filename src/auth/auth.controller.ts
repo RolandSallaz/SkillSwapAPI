@@ -21,4 +21,9 @@ export class AuthController {
   refresh(@Body('refreshToken') refreshToken: string) {
     return this.authService.refresh(refreshToken);
   }
+
+  @Post('logout')
+  logout() {
+    return this.authService.logout();
+  }
 }
