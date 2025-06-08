@@ -1,0 +1,44 @@
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { Request } from 'express';
+
+// фейковая стуктура payload JWT токена
+interface JwtPayload {
+  id: number;
+}
+
+interface AuthRequest extends Request {
+  user?: JwtPayload;
+}
+
+@Injectable()
+export class AuthGuard implements CanActivate {
+  constructor(private jwtService: JwtService) {}
+
+  canActivate(context: ExecutionContext): boolean {
+    const request = context.switchToHttp().getRequest<AuthRequest>();
+    const accessToken = request.headers['authorization'];
+
+    if (!accessToken || !accessToken.startsWith('Bearer ')) {
+      throw new UnauthorizedException('Требуется авторизация');
+    }
+
+    const token = accessToken.split(' ')[1];
+
+    try {
+      const payload = this.jwtService.verify<JwtPayload>(token, {
+        secret: 'access-secret', // фейковый секретный ключ для токена
+      });
+
+      request.user = payload;
+    } catch {
+      throw new UnauthorizedException('Требуется авторизация');
+    }
+    return true;
+  }
+}
