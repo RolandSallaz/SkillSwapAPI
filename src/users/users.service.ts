@@ -15,8 +15,17 @@ export class UsersService {
     return `This action adds a new user ${JSON.stringify(createUserDto)}`;
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll() {
+    const users = await this.userRepository.find();
+    if (!users) {
+      throw new NotFoundException(`Пользователи не найдены`);
+    }
+    const usersWithoutPassword = users.map((user) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password, ...userWithoutPassword } = user;
+      return userWithoutPassword;
+    });
+    return usersWithoutPassword;
   }
 
   async findOne(id: number) {
