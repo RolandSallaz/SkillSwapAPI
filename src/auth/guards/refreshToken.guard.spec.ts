@@ -1,11 +1,11 @@
 import { JwtService } from '@nestjs/jwt';
-import { AuthGuard } from './auth.guard';
+import { RefreshTokenGuard } from './refreshToken.guard';
 
-describe('AuthGuard', () => {
+describe('RefreshTokenGuard', () => {
   it('should be defined', () => {
     const mockedJwtService = new JwtService({
       secret: 'test-secret',
     });
-    expect(new AuthGuard(mockedJwtService)).toBeDefined();
+    expect(new RefreshTokenGuard(mockedJwtService)).toBeDefined();
   });
 });

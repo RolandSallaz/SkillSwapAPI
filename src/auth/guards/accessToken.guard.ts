@@ -8,8 +8,9 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 
 // фейковая стуктура payload JWT токена
-interface JwtPayload {
-  id: number;
+export interface JwtPayload {
+  sub: number;
+  username: string;
 }
 
 interface AuthRequest extends Request {
@@ -17,7 +18,7 @@ interface AuthRequest extends Request {
 }
 
 @Injectable()
-export class AuthGuard implements CanActivate {
+export class AccessTokenGuard implements CanActivate {
   constructor(private jwtService: JwtService) {}
 
   canActivate(context: ExecutionContext): boolean {
