@@ -45,6 +45,12 @@ export class UsersController {
     return user;
   }
 
+  @Get('email')
+  getByEmail(@Param('email') email: string) {
+    const user = this.usersService.findByEmail(email);
+    return user;
+  }
+
   @Patch('me')
   updateMe(
     @Req() req: AuthenticatedRequest,

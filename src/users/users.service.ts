@@ -17,9 +17,19 @@ export class UsersService {
     // возвращаем данные по id
     return {
       message: `Данные пользователя с id ${id}`,
-      id,
+      id: 1, // здесь должен быть реальный id пользователя
       username: 'test',
       password: 'hashed-password',
+    };
+  }
+  findByEmail(email: string) {
+    return {
+      message: `Данные пользователя с email ${email}`,
+      id: 1, // здесь должен быть реальный id пользователя
+      username: 'test',
+      password: 'hashed-password',
+      email: `${email}`,
+      role: 'User',
     };
   }
 

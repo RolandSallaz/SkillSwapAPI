@@ -49,6 +49,6 @@ export class User {
   @Column()
   favoriteSkills: string;
 
-  @Column()
+  @Column({ default: 'USER' })
   role: UserRole;
 }

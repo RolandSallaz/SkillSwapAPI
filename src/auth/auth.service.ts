@@ -12,7 +12,7 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
-    private config: ConfigService,
+    private readonly configService: ConfigService,
   ) {}
 
   register(registerDto: RegisterDto) {
@@ -25,26 +25,23 @@ export class AuthService {
     };
   }
 
-  login(loginDto: LoginDto) {
-    const user = this.usersService.findById(loginDto.id);
-    if (!user) throw new UnauthorizedException('Пользователь не найден');
+  async login(loginDto: LoginDto) {
+    // eslint-disable-next-line @typescript-eslint/await-thenable
+    const user = await this.usersService.findByEmail(loginDto.email);
+    if (!user)
+      throw new UnauthorizedException(
+        'Пользователь не найден. Неверный email или пароль',
+      );
 
-    const payload = { sub: user.id, username: user.username };
-
-    const accessToken = this.jwtService.sign(payload, {
-      secret: this.config.get('JWT_ACCESS_SECRET'),
-      expiresIn: this.config.get('JWT_ACCESS_EXPIRES_IN'),
-    });
-
-    const refreshToken = this.jwtService.sign(payload, {
-      secret: this.config.get('JWT_REFRESH_SECRET'),
-      expiresIn: this.config.get('JWT_REFRESH_EXPIRES_IN'),
-    });
+    const tokens = await this._getTokens(user);
     return {
-      message:
-        'Вход выполнен успешно, При входе должен сверяться переданный в body пароль с хешем из бд, если авторизация успешна, то отправляем jwt токен через куки',
-      accessToken,
-      refreshToken,
+      message: 'Вход выполнен успешно',
+      ...tokens,
+      user: {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+      },
     };
   }
 
@@ -59,6 +56,23 @@ export class AuthService {
   logout() {
     return {
       message: 'Вы вышли из системы',
+    };
+  }
+
+  async _getTokens(user: { id: number; email: string; role?: string }) {
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      role: user.role || 'user',
+    };
+    const accessToken = await this.jwtService.signAsync(payload);
+
+    const refreshToken = await this.jwtService.signAsync(payload, {
+      secret: this.configService.get<string>('jwt.refreshTokenSecret'),
+    });
+    return {
+      accessToken,
+      refreshToken,
     };
   }
 }
