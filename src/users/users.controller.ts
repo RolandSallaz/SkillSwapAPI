@@ -6,13 +6,19 @@ import {
   Patch,
   Param,
   Delete,
+  Req,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { UsersService } from './users.service';
-import { CreateUsersDto } from './dto/create-users.dto';
-import { UpdateUsersDto } from './dto/update-users.dto';
+import { CreateUsersDto } from './dto/create.users.dto';
+import { UpdateUsersDto } from './dto/update.users.dto';
+
+interface AuthenticatedRequest extends Request {
+  user: { sub: number; username: string };
+}
 
 //Создание точки входа для работы с пользователями
-@Controller('user')
+@Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -26,14 +32,33 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  @Get('me')
+  // нужна гварда
+  getMe(@Req() req: AuthenticatedRequest) {
+    const user = this.usersService.getMe(req.user['sub']);
+    return user;
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUsersDto: UpdateUsersDto) {
-    return this.usersService.update(+id, updateUsersDto);
+  @Get(':id')
+  getById(@Param('id') id: number) {
+    const user = this.usersService.findById(id);
+    return user;
+  }
+
+  @Patch('me')
+  updateMe(
+    @Req() req: AuthenticatedRequest,
+    @Body() updateUsersDto: UpdateUsersDto,
+  ) {
+    return this.usersService.updateMe(req.user.sub, updateUsersDto);
+  }
+
+  @Patch('me/password')
+  updateMePassword(
+    @Req() req: AuthenticatedRequest,
+    @Body() updateUsersDto: UpdateUsersDto,
+  ) {
+    return this.usersService.updateMe(req.user.sub, updateUsersDto);
   }
 
   @Delete(':id')

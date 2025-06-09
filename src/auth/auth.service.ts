@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { RegisterDto } from './dto/register.dto';
-import { LoginDto } from './dto/login.dto';
+import { RegisterDto } from './dto/register.auth.dto';
+import { LoginDto } from './dto/login.auth.dto';
 import { UsersService } from '../users/users.service';
 import { UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
+// Создание логики для работы с авторизацией
 @Injectable()
 export class AuthService {
   constructor(
@@ -25,11 +26,10 @@ export class AuthService {
   }
 
   login(loginDto: LoginDto) {
-    const user = this.usersService.findOne(loginDto.userId);
+    const user = this.usersService.findById(loginDto.id);
     if (!user) throw new UnauthorizedException('Пользователь не найден');
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const payload = { sub: user.id, username: user.name };
+    const payload = { sub: user.id, username: user.username };
 
     const accessToken = this.jwtService.sign(payload, {
       secret: this.config.get('JWT_ACCESS_SECRET'),

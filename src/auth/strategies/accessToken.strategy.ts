@@ -1,33 +1,35 @@
-import { Injectable } from '@nestjs/common';
-import { PassportStrategy } from '@nestjs/passport';
-import { ExtractJwt, Strategy } from 'passport-jwt';
-import { ConfigService } from '@nestjs/config';
+// import { Injectable } from '@nestjs/common';
+// import { PassportStrategy } from '@nestjs/passport';
+// import { ExtractJwt, Strategy } from 'passport-jwt';
+// import { ConfigService } from '@nestjs/config';
 
-interface JwtPayload {
-  sub: number;
-  username: string;
-}
+// interface JwtPayload {
+//   sub: number;
+//   username: string;
+// }
 
-@Injectable()
-export class AccessTokenStrategy extends PassportStrategy(
-  Strategy,
-  'jwt-access',
-) {
-  constructor(private configService: ConfigService) {
-    const secret = configService.get<string>('JWT_ACCESS_SECRET');
+// console.log('Strategy:', Strategy);
 
-    if (!secret) {
-      throw new Error('JWT_ACCESS_SECRET не найден');
-    }
+// @Injectable()
+// export class AccessTokenStrategy extends PassportStrategy(
+//   Strategy,
+//   'jwt-access',
+// ) {
+//   constructor(private configService: ConfigService) {
+//     const secret = configService.get<string>('JWT_ACCESS_SECRET');
 
-    super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      ignoreExpiration: false, // срок жизни
-      secretOrKey: secret,
-    });
-  }
+//     if (!secret) {
+//       throw new Error('JWT_ACCESS_SECRET не найден');
+//     }
 
-  validate(payload: JwtPayload) {
-    return { userId: payload.sub, username: payload.username };
-  }
-}
+//     super({
+//       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+//       ignoreExpiration: false,
+//       secretOrKey: secret,
+//     });
+//   }
+
+//   validate(payload: JwtPayload) {
+//     return { userId: payload.sub, username: payload.username };
+//   }
+// }

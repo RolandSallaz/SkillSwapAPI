@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUsersDto } from './dto/create-users.dto';
-import { UpdateUsersDto } from './dto/update-users.dto';
+import { CreateUsersDto } from './dto/create.users.dto';
+import { UpdateUsersDto } from './dto/update.users.dto';
 
 //Создание логики для работы с пользователями
 @Injectable()
@@ -13,12 +13,32 @@ export class UsersService {
     return `Вывод всех пользователей`;
   }
 
-  findOne(id: number) {
-    return `Найти пользователя по #${id}`;
+  findById(id: number) {
+    // возвращаем данные по id
+    return {
+      message: `Данные пользователя с id ${id}`,
+      id,
+      username: 'test',
+      password: 'hashed-password',
+    };
   }
 
-  update(id: number, updateUsersDto: UpdateUsersDto) {
-    return `Обновление пользователя по #${id} ${updateUsersDto.name}`;
+  getMe(id: number) {
+    // возвращаем данные текущего пользователя
+    return {
+      message: 'Данные текущего пользователя',
+      id,
+      username: 'current-user',
+      password: 'hashed-password',
+    };
+  }
+
+  updateMe(id: number, updateUsersDto: UpdateUsersDto) {
+    return `Обновление пользователя #${id} с данными: ${JSON.stringify(updateUsersDto)}`;
+  }
+
+  updateMePassword(id: number, updateUsersDto: UpdateUsersDto) {
+    return `Обновление пароля пользователя #${id} с данными: ${JSON.stringify(updateUsersDto)}`;
   }
 
   remove(id: number) {
