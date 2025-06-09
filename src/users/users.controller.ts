@@ -39,6 +39,12 @@ export class UsersController {
   }
 
   @UseGuards(AccessTokenGuard)
+  @Get('me')
+  findCurrentUser(@Req() req: RequestWithUser) {
+    return this.usersService.findOne(req.user.sub);
+  }
+
+  @UseGuards(AccessTokenGuard)
   @Patch('me')
   updateUser(
     @Req() req: RequestWithUser,
