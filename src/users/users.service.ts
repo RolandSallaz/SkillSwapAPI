@@ -71,7 +71,7 @@ export class UsersService {
   remove(id: number) {
     return `This action removes a #${id} user`;
   }
-  
+
   findByEmail(email: string) {
     return {
       message: `Данные пользователя с email ${email}`,
@@ -82,6 +82,4 @@ export class UsersService {
       role: 'User',
     };
   }
-
-  
 }
