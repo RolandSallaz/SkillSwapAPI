@@ -6,15 +6,18 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
   Req,
 } from '@nestjs/common';
-import { Request } from 'express';
 import { UsersService } from './users.service';
-import { CreateUsersDto } from './dto/create.users.dto';
-import { UpdateUsersDto } from './dto/update.users.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
+import { JwtPayload } from '../auth/guards/accessToken.guard';
+import { Request } from 'express';
 
-interface AuthenticatedRequest extends Request {
-  user: { sub: number; username: string };
+export interface RequestWithUser extends Request {
+  user: JwtPayload;
 }
 
 //Создание точки входа для работы с пользователями
@@ -23,8 +26,8 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  create(@Body() createUsersDto: CreateUsersDto) {
-    return this.usersService.create(createUsersDto);
+  create(@Body() createUserDto: CreateUserDto) {
+    return this.usersService.create(createUserDto);
   }
 
   @Get()
@@ -32,39 +35,33 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
-  @Get('me')
-  // нужна гварда
-  getMe(@Req() req: AuthenticatedRequest) {
-    const user = this.usersService.getMe(req.user['sub']);
-    return user;
-  }
-
   @Get(':id')
-  getById(@Param('id') id: number) {
-    const user = this.usersService.findById(id);
-    return user;
+  findOne(@Param('id') id: string) {
+    return this.usersService.findOne(+id);
   }
 
-  @Get('email')
-  getByEmail(@Param('email') email: string) {
-    const user = this.usersService.findByEmail(email);
-    return user;
+  @UseGuards(AccessTokenGuard)
+  @Get('me')
+  findCurrentUser(@Req() req: RequestWithUser) {
+    return this.usersService.findOne(req.user.sub);
   }
 
+  @UseGuards(AccessTokenGuard)
   @Patch('me')
-  updateMe(
-    @Req() req: AuthenticatedRequest,
-    @Body() updateUsersDto: UpdateUsersDto,
+  updateUser(
+    @Req() req: RequestWithUser,
+    @Body() updateUserDto: UpdateUserDto,
   ) {
-    return this.usersService.updateMe(req.user.sub, updateUsersDto);
+    return this.usersService.updateUser(req.user.sub, updateUserDto);
   }
 
+  @UseGuards(AccessTokenGuard)
   @Patch('me/password')
-  updateMePassword(
-    @Req() req: AuthenticatedRequest,
-    @Body() updateUsersDto: UpdateUsersDto,
+  updatePassword(
+    @Req() req: RequestWithUser,
+    @Body('password') password: string,
   ) {
-    return this.usersService.updateMe(req.user.sub, updateUsersDto);
+    return this.usersService.updatePassword(req.user.sub, password);
   }
 
   @Delete(':id')
