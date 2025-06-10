@@ -10,10 +10,11 @@ import { Request } from 'express';
 // фейковая стуктура payload JWT токена
 export interface JwtPayload {
   sub: number;
-  username: string;
+  email: string;
+  role: 'USER' | 'ADMIN';
 }
 
-interface AuthRequest extends Request {
+export interface AuthRequest extends Request {
   user?: JwtPayload;
 }
 
@@ -33,7 +34,7 @@ export class AccessTokenGuard implements CanActivate {
 
     try {
       const payload = this.jwtService.verify<JwtPayload>(token, {
-        secret: 'access-secret', // фейковый секретный ключ для токена
+        secret: process.env.JWT_ACCESS_SECRET,
       });
 
       request.user = payload;

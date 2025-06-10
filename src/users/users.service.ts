@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -17,9 +17,6 @@ export class UsersService {
 
   async findAll() {
     const users = await this.userRepository.find();
-    if (!users) {
-      throw new NotFoundException(`Пользователи не найдены`);
-    }
     const usersWithoutPassword = users.map((user) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password, ...userWithoutPassword } = user;
@@ -29,10 +26,7 @@ export class UsersService {
   }
 
   async findOne(id: number) {
-    const user = await this.userRepository.findOneBy({ id });
-    if (!user) {
-      throw new NotFoundException(`Пользователь не найден`);
-    }
+    const user = await this.userRepository.findOneByOrFail({ id });
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...userWithoutPassword } = user;
 
@@ -40,13 +34,11 @@ export class UsersService {
   }
 
   async updateUser(id: number, updateUserDto: UpdateUserDto) {
-    await this.userRepository.update(id, updateUserDto);
-    const updatedUser = await this.userRepository.findOneBy({ id });
-
-    if (!updatedUser) {
-      throw new NotFoundException(`Пользователь не найден`);
-    }
-
+    const user = await this.userRepository.findOneByOrFail({ id });
+    const updatedUser = await this.userRepository.save({
+      ...user,
+      ...updateUserDto,
+    });
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...userWithoutPassword } = updatedUser;
 
@@ -55,15 +47,13 @@ export class UsersService {
 
   async updatePassword(id: number, newPassword: string) {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-    await this.userRepository.update(id, { password: hashedPassword });
-    const user = await this.userRepository.findOneBy({ id });
-
-    if (!user) {
-      throw new NotFoundException(`Пользователь не найден`);
-    }
-
+    const user = await this.userRepository.findOneByOrFail({ id });
+    const updatedUser = await this.userRepository.save({
+      ...user,
+      password: hashedPassword,
+    });
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...userWithoutPassword } = user;
+    const { password, ...userWithoutPassword } = updatedUser;
 
     return userWithoutPassword;
   }
