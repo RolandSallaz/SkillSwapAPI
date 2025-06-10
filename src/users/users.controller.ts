@@ -19,6 +19,8 @@ import { Request } from 'express';
 export interface RequestWithUser extends Request {
   user: JwtPayload;
 }
+
+//Создание точки входа для работы с пользователями
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}

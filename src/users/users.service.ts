@@ -61,4 +61,15 @@ export class UsersService {
   remove(id: number) {
     return `This action removes a #${id} user`;
   }
+
+  findByEmail(email: string) {
+    return {
+      message: `Данные пользователя с email ${email}`,
+      id: 1, // здесь должен быть реальный id пользователя
+      username: 'test',
+      password: 'hashed-password',
+      email: `${email}`,
+      role: 'User',
+    };
+  }
 }
