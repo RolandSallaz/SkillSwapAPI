@@ -26,6 +26,7 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
+    // eslint-disable-next-line @typescript-eslint/await-thenable
     const user = await this.usersService.findByEmail(loginDto.email);
     if (!user)
       throw new UnauthorizedException(
