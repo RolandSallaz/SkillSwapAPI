@@ -20,25 +20,27 @@ interface AuthRequest extends Request {
 @Injectable()
 export class AccessTokenGuard implements CanActivate {
   constructor(private jwtService: JwtService) {}
-
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<AuthRequest>();
+    console.log('JWT request.headers:', request.headers);
     const accessToken = request.headers['authorization'];
+    console.log('JWT accessToken:', accessToken);
 
     if (!accessToken || !accessToken.startsWith('Bearer ')) {
-      throw new UnauthorizedException('Требуется авторизация');
+      throw new UnauthorizedException('Требуется авторизация bearer');
     }
 
     const token = accessToken.split(' ')[1];
-
+    console.log('JWT token:', token);
     try {
+      console.log('JWT token2:', token);
       const payload = this.jwtService.verify<JwtPayload>(token, {
-        secret: 'access-secret', // фейковый секретный ключ для токена
+        secret: 'a-string-secret-at-least-256-bits-long', // фейковый секретный ключ для токена
       });
-
+      console.log('JWT payload:', payload);
       request.user = payload;
     } catch {
-      throw new UnauthorizedException('Требуется авторизация');
+      throw new UnauthorizedException('Требуется авторизацияdd');
     }
     return true;
   }

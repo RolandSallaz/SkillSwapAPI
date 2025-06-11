@@ -26,7 +26,7 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    const user = this.usersService.findByEmail(loginDto.email);
+    const user = await this.usersService.findByEmail(loginDto.email);
     if (!user)
       throw new UnauthorizedException(
         'Пользователь не найден. Неверный email или пароль',

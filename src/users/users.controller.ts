@@ -10,8 +10,8 @@ import {
   Req,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateUsersDto } from './dto/create.users.dto';
+import { UpdateUsersDto } from './dto/update.users.dto';
 import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
 import { JwtPayload } from '../auth/guards/accessToken.guard';
 import { Request } from 'express';
@@ -26,7 +26,7 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
+  create(@Body() createUserDto: CreateUsersDto) {
     return this.usersService.create(createUserDto);
   }
 
@@ -43,6 +43,9 @@ export class UsersController {
   @UseGuards(AccessTokenGuard)
   @Get('me')
   findCurrentUser(@Req() req: RequestWithUser) {
+    console.log('Decoded user:');
+    console.log('req.user:', req.user);
+    console.log('typeof req.user.sub:', typeof req.user?.sub);
     return this.usersService.findOne(req.user.sub);
   }
 
@@ -50,9 +53,9 @@ export class UsersController {
   @Patch('me')
   updateUser(
     @Req() req: RequestWithUser,
-    @Body() updateUserDto: UpdateUserDto,
+    @Body() updateUserDto: UpdateUsersDto,
   ) {
-    return this.usersService.updateUser(req.user.sub, updateUserDto);
+    return this.usersService.updateUser(+req.user.sub, updateUserDto);
   }
 
   @UseGuards(AccessTokenGuard)
@@ -61,7 +64,7 @@ export class UsersController {
     @Req() req: RequestWithUser,
     @Body('password') password: string,
   ) {
-    return this.usersService.updatePassword(req.user.sub, password);
+    return this.usersService.updatePassword(+req.user.sub, password);
   }
 
   @Delete(':id')
