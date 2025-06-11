@@ -5,7 +5,7 @@ import { LoginDto } from './dto/login.auth.dto';
 import { UsersService } from '../users/users.service';
 import { UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-
+import * as bcrypt from 'bcrypt';
 // Создание логики для работы с авторизацией
 @Injectable()
 export class AuthService {
@@ -27,7 +27,8 @@ export class AuthService {
 
   async login(loginDto: LoginDto) {
     const user = this.usersService.findByEmail(loginDto.email);
-    if (!user)
+    const hashedPassword = await bcrypt.hash(loginDto.password, 10);
+    if (!user || user?.password !== hashedPassword)
       throw new UnauthorizedException(
         'Пользователь не найден. Неверный email или пароль',
       );
@@ -44,12 +45,8 @@ export class AuthService {
     };
   }
 
-  refresh(refreshToken: string) {
-    console.log('refreshToken:', refreshToken);
-    return {
-      accessToken: 'newAccessToken',
-      refreshToken: 'newRefreshToken',
-    };
+  async refresh(payload: { id: number; email: string; role?: string }) {
+    return await this._getTokens(payload);
   }
 
   logout() {
