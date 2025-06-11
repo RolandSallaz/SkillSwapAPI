@@ -6,10 +6,14 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthRequest, JwtPayload } from './accessToken.guard';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class RefreshTokenGuard implements CanActivate {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    private readonly configService: ConfigService,
+  ) {}
 
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<AuthRequest>();
@@ -23,7 +27,7 @@ export class RefreshTokenGuard implements CanActivate {
 
     try {
       const payload = this.jwtService.verify<JwtPayload>(token, {
-        secret: process.env.JWT_REFRESH_SECRET,
+        secret: this.configService.get<string>('jwt.refreshTokenSecret'),
       });
       request.user = payload;
     } catch {
