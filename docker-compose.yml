@@ -42,6 +42,8 @@ services:
       dockerfile: Dockerfile.backend
     container_name: backend
     environment:
+      DATABASE_HOST: postgres
+      DATABASE_PORT: ${DATABASE_PORT}
       PORT: ${PORT}
     ports:
       - 3000:${PORT}
