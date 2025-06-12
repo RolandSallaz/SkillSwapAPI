@@ -42,8 +42,20 @@ services:
       dockerfile: Dockerfile.backend
     container_name: backend
     environment:
+      # DB
       DATABASE_HOST: postgres
       DATABASE_PORT: ${DATABASE_PORT}
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+
+      # JWT
+      JWT_ACCESS_EXPIRES_IN: ${JWT_ACCESS_EXPIRES_IN}
+      JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      
+      # other
       PORT: ${PORT}
     ports:
       - 3000:${PORT}
@@ -51,6 +63,8 @@ services:
       - postgres
     volumes:
       - backend_data:/app/src
+    networks:
+      - skill_swap
 
   postgres:
     image: postgres:14
