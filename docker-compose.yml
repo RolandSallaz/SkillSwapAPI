@@ -1,0 +1,71 @@
+volumes:
+  postgres_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./docker/volumes
+
+  backend_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./src
+
+  frontend:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./frontend
+
+services:
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.frontend
+    container_name: frontend 
+    ports:
+      - "8080:80"
+    environment:
+      - NODE_ENV=development
+    networks:
+      - skill_swap
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: backend
+    environment:
+      PORT: ${PORT}
+    ports:
+      - 3000:${PORT}
+    depends_on:
+      - postgres
+    volumes:
+      - backend_data:/app/src
+
+  postgres:
+    image: postgres:14
+    container_name: postgres
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+      PGPORT: ${DATABASE_PORT}
+    ports:
+      - 15432:${DATABASE_PORT}
+    restart: always
+    networks:
+      - skill_swap
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+networks:
+  skill_swap:
+    external: false
