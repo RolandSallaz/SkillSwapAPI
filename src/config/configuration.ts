@@ -1,4 +1,5 @@
 import * as dotenv from 'dotenv';
+import { logger } from './mainLogger';
 dotenv.config();
 
 export default () => ({
@@ -11,12 +12,14 @@ export default () => ({
   },
 });
 
-console.log('Проверка подгрузки env', {
-  port: process.env.PORT,
-  jwt: {
-    accessTokenSecretExpiresIn: process.env.JWT_ACCESS_EXPIRES_IN,
-    refreshTokenExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
-    accessTokenSecret: process.env.JWT_ACCESS_SECRET,
-    refreshTokenSecret: process.env.JWT_REFRESH_SECRET,
-  },
-});
+logger.log(
+  `Проверка подгрузки env ${JSON.stringify({
+    port: process.env.PORT,
+    jwt: {
+      accessTokenSecretExpiresIn: process.env.JWT_ACCESS_EXPIRES_IN,
+      refreshTokenExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
+      accessTokenSecret: process.env.JWT_ACCESS_SECRET,
+      refreshTokenSecret: process.env.JWT_REFRESH_SECRET,
+    },
+  }, null, 2)
+}`);

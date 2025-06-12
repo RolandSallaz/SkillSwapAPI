@@ -25,6 +25,20 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+## Run dev in docker
+
+### run all conteiners
+
+```
+make docker-up
+```
+
+### stop all conteiners
+
+```
+make docker-down
+```
+
 ## Project setup
 
 ```bash
