@@ -13,7 +13,7 @@ volumes:
       o: bind
       device: ./src
 
-  frontend:
+  frontend_data:
     driver: local
     driver_opts:
       type: none
