@@ -19,7 +19,7 @@ export class UsersService {
     const users = await this.userRepository.find();
     const usersWithoutPassword = users.map((user) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...userWithoutPassword } = user;
+      const { password, refreshToken, ...userWithoutPassword } = user;
       return userWithoutPassword;
     });
     return usersWithoutPassword;
@@ -28,7 +28,7 @@ export class UsersService {
   async findOne(id: number) {
     const user = await this.userRepository.findOneByOrFail({ id });
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...userWithoutPassword } = user;
+    const { password, refreshToken, ...userWithoutPassword } = user;
 
     return userWithoutPassword;
   }
@@ -40,7 +40,7 @@ export class UsersService {
       ...updateUserDto,
     });
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...userWithoutPassword } = updatedUser;
+    const { password, refreshToken, ...userWithoutPassword } = updatedUser;
 
     return userWithoutPassword;
   }
@@ -53,7 +53,7 @@ export class UsersService {
       password: hashedPassword,
     });
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...userWithoutPassword } = updatedUser;
+    const { password, refreshToken, ...userWithoutPassword } = updatedUser;
 
     return userWithoutPassword;
   }
@@ -71,5 +71,12 @@ export class UsersService {
       email: `${email}`,
       role: 'User',
     };
+  }
+
+  async removeRefreshToken(id: number) {
+    const user = await this.userRepository.findOneByOrFail({ id });
+    user.refreshToken = '';
+    await this.userRepository.save(user);
+    return { message: `Refresh token для пользователя с id ${id} удален` };
   }
 }

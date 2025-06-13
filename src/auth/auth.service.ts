@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { RegisterDto } from './dto/register.auth.dto';
 import { LoginDto } from './dto/login.auth.dto';
 import { UsersService } from '../users/users.service';
 import { UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
+import { CreateUsersDto } from 'src/users/dto/create.users.dto';
 // Создание логики для работы с авторизацией
 @Injectable()
 export class AuthService {
@@ -14,16 +14,39 @@ export class AuthService {
     private jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
+  //register для регистрации: возвращает данные пользователя и токена refreshToken и accessToken
+  register(user: CreateUsersDto) {
+    // const hashedPassword = bcrypt.hash(user.password, 10);
+    // let id: number;
+    // const randomNum = async (num) => {
+    //   id = Math.floor(Math.random() * num);
+    //   if (await this.usersService.findOne(id)) {
+    //     await randomNum(num);
+    //   }
+    //   return id;
+    // };
+    // await randomNum(100000000000000000000);
 
-  register(registerDto: RegisterDto) {
+    // const tokens = this._getTokens({
+    //   id: id,
+    //   email: user.email,
+    //   role: user.role,
+    // });
+    // const newUser = await this.usersService.create({
+    //   ...user,
+    //   password: hashedPassword,
+    //   id: id,
+    //   token: tokens.refreshToken
+    // });
     return {
       message:
         'Регистрация прошла успешно, При регистрации пароль должен хешироваться перед сохранением в бд',
-      user: registerDto,
+      user: user,
       accessToken: 'fake-accessToken',
       refreshToken: 'fake-refreshToken',
     };
   }
+  //login для входа в аккаунт: возвращает данные пользователя и токены refreshToken и accessToken
 
   async login(loginDto: LoginDto) {
     const user = this.usersService.findByEmail(loginDto.email);
@@ -49,10 +72,8 @@ export class AuthService {
     return await this._getTokens(payload);
   }
 
-  logout() {
-    return {
-      message: 'Вы вышли из системы',
-    };
+  async logout(id: number) {
+    return await this.usersService.removeRefreshToken(id);
   }
 
   async _getTokens(user: { id: number; email: string; role?: string }) {

@@ -7,18 +7,18 @@ import {
   Req,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { RegisterDto } from './dto/register.auth.dto';
 import { LoginDto } from './dto/login.auth.dto';
 import { RefreshTokenGuard } from './guards/refreshToken.guard';
-import { AuthRequest } from './guards/accessToken.guard';
+import { AccessTokenGuard, AuthRequest } from './guards/accessToken.guard';
+import { CreateUsersDto } from 'src/users/dto/create.users.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  register(@Body() registerDto: RegisterDto) {
-    return this.authService.register(registerDto);
+  register(@Body() user: CreateUsersDto) {
+    return this.authService.register(user);
   }
 
   @Post('login')
@@ -36,10 +36,10 @@ export class AuthController {
       role: req.user.role,
     });
   }
-
+  @UseGuards(AccessTokenGuard)
   @Post('logout')
   @HttpCode(200)
-  logout() {
-    return this.authService.logout();
+  logout(@Req() req: AuthRequest) {
+    return this.authService.logout(req.user.sub);
   }
 }
