@@ -10,7 +10,7 @@ import { ConfigService } from '@nestjs/config';
 
 // фейковая стуктура payload JWT токена
 export interface JwtPayload {
-  sub: number;
+  sub: string;
   email: string;
   role: 'USER' | 'ADMIN';
 }

@@ -11,8 +11,12 @@ export class UsersService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
-  create(createUserDto: CreateUserDto) {
-    return `This action adds a new user ${JSON.stringify(createUserDto)}`;
+  async create(createUserDto: CreateUserDto) {
+    const user = await this.userRepository.save(createUserDto);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, refreshToken, ...userWithoutPassword } = user;
+
+    return userWithoutPassword;
   }
 
   async findAll() {
@@ -25,7 +29,7 @@ export class UsersService {
     return usersWithoutPassword;
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     const user = await this.userRepository.findOneByOrFail({ id });
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, refreshToken, ...userWithoutPassword } = user;
@@ -33,7 +37,7 @@ export class UsersService {
     return userWithoutPassword;
   }
 
-  async updateUser(id: number, updateUserDto: UpdateUserDto) {
+  async updateUser(id: string, updateUserDto: UpdateUserDto) {
     const user = await this.userRepository.findOneByOrFail({ id });
     const updatedUser = await this.userRepository.save({
       ...user,
@@ -45,7 +49,7 @@ export class UsersService {
     return userWithoutPassword;
   }
 
-  async updatePassword(id: number, newPassword: string) {
+  async updatePassword(id: string, newPassword: string) {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     const user = await this.userRepository.findOneByOrFail({ id });
     const updatedUser = await this.userRepository.save({
@@ -62,18 +66,13 @@ export class UsersService {
     return `This action removes a #${id} user`;
   }
 
-  findByEmail(email: string) {
-    return {
-      message: `Данные пользователя с email ${email}`,
-      id: 1, // здесь должен быть реальный id пользователя
-      username: 'test',
-      password: 'hashed-password',
-      email: `${email}`,
-      role: 'User',
-    };
+  async findByEmail(email: string) {
+    return await this.userRepository.findOneOrFail({
+      where: { email },
+    });
   }
 
-  async removeRefreshToken(id: number) {
+  async removeRefreshToken(id: string) {
     const user = await this.userRepository.findOneByOrFail({ id });
     user.refreshToken = '';
     await this.userRepository.save(user);

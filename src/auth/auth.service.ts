@@ -5,7 +5,9 @@ import { UsersService } from '../users/users.service';
 import { UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
-import { CreateUsersDto } from 'src/users/dto/create.users.dto';
+import { RegisterDto } from './dto/register.auth.dto';
+import { v4 as uuidv4 } from 'uuid';
+
 // Создание логики для работы с авторизацией
 @Injectable()
 export class AuthService {
@@ -14,44 +16,46 @@ export class AuthService {
     private jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
-  //register для регистрации: возвращает данные пользователя и токена refreshToken и accessToken
-  register(user: CreateUsersDto) {
-    // const hashedPassword = bcrypt.hash(user.password, 10);
-    // let id: number;
-    // const randomNum = async (num) => {
-    //   id = Math.floor(Math.random() * num);
-    //   if (await this.usersService.findOne(id)) {
-    //     await randomNum(num);
-    //   }
-    //   return id;
-    // };
-    // await randomNum(100000000000000000000);
 
-    // const tokens = this._getTokens({
-    //   id: id,
-    //   email: user.email,
-    //   role: user.role,
-    // });
-    // const newUser = await this.usersService.create({
-    //   ...user,
-    //   password: hashedPassword,
-    //   id: id,
-    //   token: tokens.refreshToken
-    // });
+  //register для регистрации: возвращает данные пользователя и токена refreshToken и accessToken
+  async register(registerDto: RegisterDto) {
+    const existingUser = await this.usersService.findByEmail(registerDto.email);
+    if (existingUser) {
+      throw new UnauthorizedException(
+        'Пользователь с таким email уже существует',
+      );
+    }
+    const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+    const id = uuidv4();
+    const tokens = await this._getTokens({
+      id,
+      email: registerDto.email,
+    });
+    const hashedRefreshToken = await bcrypt.hash(tokens.refreshToken, 10);
+    const newUser = await this.usersService.create({
+      ...registerDto,
+      password: hashedPassword,
+      id,
+      refreshToken: hashedRefreshToken,
+      role: 'user',
+    });
     return {
-      message:
-        'Регистрация прошла успешно, При регистрации пароль должен хешироваться перед сохранением в бд',
-      user: user,
-      accessToken: 'fake-accessToken',
-      refreshToken: 'fake-refreshToken',
+      message: 'Регистрация прошла успешно',
+      user: newUser,
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
     };
   }
-  //login для входа в аккаунт: возвращает данные пользователя и токены refreshToken и accessToken
+  //При входе должен сверяться переданный в body пароль с хешем из бд, если авторизация успешна, то отправляем jwt токен через куки
 
+  //login для входа в аккаунт: возвращает данные пользователя и токены refreshToken и accessToken
   async login(loginDto: LoginDto) {
-    const user = this.usersService.findByEmail(loginDto.email);
-    const hashedPassword = await bcrypt.hash(loginDto.password, 10);
-    if (!user || user?.password !== hashedPassword)
+    const user = await this.usersService.findByEmail(loginDto.email);
+    const passwordMatch = await bcrypt.compare(
+      loginDto.password,
+      user.password,
+    );
+    if (!passwordMatch)
       throw new UnauthorizedException(
         'Пользователь не найден. Неверный email или пароль',
       );
@@ -68,15 +72,15 @@ export class AuthService {
     };
   }
 
-  async refresh(payload: { id: number; email: string; role?: string }) {
+  async refresh(payload: { id: string; email: string; role?: string }) {
     return await this._getTokens(payload);
   }
 
-  async logout(id: number) {
+  async logout(id: string) {
     return await this.usersService.removeRefreshToken(id);
   }
 
-  async _getTokens(user: { id: number; email: string; role?: string }) {
+  async _getTokens(user: { id: string; email: string; role?: string }) {
     const payload = {
       sub: user.id,
       email: user.email,
@@ -87,6 +91,7 @@ export class AuthService {
     const refreshToken = await this.jwtService.signAsync(payload, {
       secret: this.configService.get<string>('jwt.refreshTokenSecret'),
     });
+
     return {
       accessToken,
       refreshToken,
