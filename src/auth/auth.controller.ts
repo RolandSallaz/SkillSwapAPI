@@ -10,15 +10,15 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.auth.dto';
 import { RefreshTokenGuard } from './guards/refreshToken.guard';
 import { AccessTokenGuard, AuthRequest } from './guards/accessToken.guard';
-import { CreateUsersDto } from 'src/users/dto/create.users.dto';
+import { RegisterDto } from './dto/register.auth.dto';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  register(@Body() user: CreateUsersDto) {
-    return this.authService.register(user);
+  register(@Body() registerDto: RegisterDto) {
+    return this.authService.register(registerDto);
   }
 
   @Post('login')

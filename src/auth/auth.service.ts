@@ -8,7 +8,6 @@ import * as bcrypt from 'bcrypt';
 import { RegisterDto } from './dto/register.auth.dto';
 import { v4 as uuidv4 } from 'uuid';
 
-// Создание логики для работы с авторизацией
 @Injectable()
 export class AuthService {
   constructor(
@@ -17,7 +16,6 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  //register для регистрации: возвращает данные пользователя и токена refreshToken и accessToken
   async register(registerDto: RegisterDto) {
     const existingUser = await this.usersService.findByEmail(registerDto.email);
     if (existingUser) {
@@ -46,9 +44,7 @@ export class AuthService {
       refreshToken: tokens.refreshToken,
     };
   }
-  //При входе должен сверяться переданный в body пароль с хешем из бд, если авторизация успешна, то отправляем jwt токен через куки
 
-  //login для входа в аккаунт: возвращает данные пользователя и токены refreshToken и accessToken
   async login(loginDto: LoginDto) {
     const user = await this.usersService.findByEmail(loginDto.email);
     const passwordMatch = await bcrypt.compare(
@@ -56,24 +52,25 @@ export class AuthService {
       user.password,
     );
     if (!passwordMatch)
-      throw new UnauthorizedException(
-        'Пользователь не найден. Неверный email или пароль',
-      );
+      throw new UnauthorizedException('Неверный email или пароль');
 
-    const tokens = await this._getTokens(user);
-    return {
-      message: 'Вход выполнен успешно',
-      ...tokens,
-      user: {
-        id: user.id,
-        email: user.email,
-        role: user.role,
-      },
-    };
+    return await this.refresh({
+      id: user.id,
+      email: user.email,
+      role: user.role,
+    });
   }
 
-  async refresh(payload: { id: string; email: string; role?: string }) {
-    return await this._getTokens(payload);
+  async refresh(user: { id: string; email: string; role?: string }) {
+    const tokens = await this._getTokens(user);
+    const hashedRefreshToken = await bcrypt.hash(tokens.refreshToken, 10);
+    const updatedUser = await this.usersService.updateUser(user.id, {
+      refreshToken: hashedRefreshToken,
+    });
+    return {
+      ...tokens,
+      user: updatedUser,
+    };
   }
 
   async logout(id: string) {
@@ -90,6 +87,7 @@ export class AuthService {
 
     const refreshToken = await this.jwtService.signAsync(payload, {
       secret: this.configService.get<string>('jwt.refreshTokenSecret'),
+      expiresIn: this.configService.get<string>('jwt.refreshTokenExpiresIn'),
     });
 
     return {
