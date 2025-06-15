@@ -12,7 +12,7 @@ import { ConfigService } from '@nestjs/config';
 export interface JwtPayload {
   sub: string;
   email: string;
-  role: 'USER' | 'ADMIN';
+  role: 'user' | 'admin';
 }
 
 export interface AuthRequest extends Request {

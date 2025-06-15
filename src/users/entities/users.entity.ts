@@ -6,14 +6,14 @@ export enum Gender {
 }
 
 export enum UserRole {
-  USER = 'USER',
-  ADMIN = 'ADMIN',
+  USER = 'user',
+  ADMIN = 'admin',
 }
 
 //Данные пользователя для базы
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ length: 100 })
@@ -49,7 +49,7 @@ export class User {
   @Column()
   favoriteSkills: string;
 
-  @Column({ default: 'USER' })
+  @Column({ default: 'user' })
   role: UserRole;
 
   @Column()

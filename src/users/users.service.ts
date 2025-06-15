@@ -62,12 +62,13 @@ export class UsersService {
     return userWithoutPassword;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: string) {
+    await this.userRepository.delete(id);
+    return `Пользователь с id #${id} удален`;
   }
 
   async findByEmail(email: string) {
-    return await this.userRepository.findOneOrFail({
+    return await this.userRepository.findOne({
       where: { email },
     });
   }

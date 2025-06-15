@@ -47,6 +47,9 @@ export class AuthService {
 
   async login(loginDto: LoginDto) {
     const user = await this.usersService.findByEmail(loginDto.email);
+    if (!user) {
+      throw new UnauthorizedException('Пользователь не найден');
+    }
     const passwordMatch = await bcrypt.compare(
       loginDto.password,
       user.password,
