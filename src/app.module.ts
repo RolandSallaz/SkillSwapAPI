@@ -8,6 +8,7 @@ import { AppDataSource } from './config/ormconfig';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
+import { AccessTokenGuard } from './auth/guards/accessToken.guard';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { JwtModule } from '@nestjs/jwt';
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, AccessTokenGuard],
+  exports: [AccessTokenGuard],
 })
 export class AppModule {}

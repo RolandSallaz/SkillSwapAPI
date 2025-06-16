@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -11,6 +11,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
+
   async create(createUserDto: CreateUserDto) {
     const user = await this.userRepository.save(createUserDto);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -41,6 +42,7 @@ export class UsersService {
       ...user,
       ...updateUserDto,
     });
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, refreshToken, ...userWithoutPassword } = updatedUser;
     return userWithoutPassword;

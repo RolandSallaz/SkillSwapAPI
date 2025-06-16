@@ -54,9 +54,9 @@ export class AuthService {
       loginDto.password,
       user.password,
     );
-    if (!passwordMatch)
+    if (!passwordMatch) {
       throw new UnauthorizedException('Неверный email или пароль');
-
+    }
     return await this.refresh({
       id: user.id,
       email: user.email,
