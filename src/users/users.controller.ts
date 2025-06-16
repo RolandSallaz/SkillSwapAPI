@@ -10,15 +10,12 @@ import {
   Req,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUsersDto } from './dto/create.users.dto';
-import { UpdateUsersDto } from './dto/update.users.dto';
-import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
-import { JwtPayload } from '../auth/guards/accessToken.guard';
-import { Request } from 'express';
-
-export interface RequestWithUser extends Request {
-  user: JwtPayload;
-}
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import {
+  AccessTokenGuard,
+  AuthRequest,
+} from '../auth/guards/accessToken.guard';
 
 //Создание точки входа для работы с пользователями
 @Controller('users')
@@ -35,40 +32,31 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
-  }
-
   @UseGuards(AccessTokenGuard)
   @Get('me')
-  findCurrentUser(@Req() req: RequestWithUser) {
-    console.log('Decoded user:');
-    console.log('req.user:', req.user);
-    console.log('typeof req.user.sub:', typeof req.user?.sub);
+  findCurrentUser(@Req() req: AuthRequest) {
     return this.usersService.findOne(req.user.sub);
   }
 
   @UseGuards(AccessTokenGuard)
   @Patch('me')
-  updateUser(
-    @Req() req: RequestWithUser,
-    @Body() updateUserDto: UpdateUsersDto,
-  ) {
-    return this.usersService.updateUser(+req.user.sub, updateUserDto);
+  updateUser(@Req() req: AuthRequest, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.updateUser(req.user.sub, updateUserDto);
   }
 
   @UseGuards(AccessTokenGuard)
   @Patch('me/password')
-  updatePassword(
-    @Req() req: RequestWithUser,
-    @Body('password') password: string,
-  ) {
-    return this.usersService.updatePassword(+req.user.sub, password);
+  updatePassword(@Req() req: AuthRequest, @Body('password') password: string) {
+    return this.usersService.updatePassword(req.user.sub, password);
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.usersService.findOne(id);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+    return this.usersService.remove(id);
   }
 }
