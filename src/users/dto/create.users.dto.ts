@@ -4,12 +4,11 @@ import {
   IsEnum,
   IsNotEmpty,
   IsString,
-  Min,
-  Max,
   IsUUID,
-  IsOptional,
+  Max,
+  Min,
 } from 'class-validator';
-import { Gender, User, UserRole } from '../entities/users.entity';
+import { Gender, User } from '../entities/users.entity';
 
 // DTO для создания пользователя при передачи данных через API
 export class CreateUsersDto extends PartialType(User) {

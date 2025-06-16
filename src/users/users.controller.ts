@@ -1,21 +1,19 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
-  UseGuards,
+  Get,
+  Param,
+  Patch,
   Req,
+  UseGuards,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
 import {
   AccessTokenGuard,
   AuthRequest,
 } from '../auth/guards/accessToken.guard';
-import { CreateUsersDto } from './dto/create.users.dto';
 import { UpdateUsersDto } from './dto/update.users.dto';
+import { UsersService } from './users.service';
 
 //Создание точки входа для работы с пользователями
 @Controller('users')

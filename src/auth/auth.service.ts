@@ -7,7 +7,6 @@ import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { RegisterDto } from './dto/register.auth.dto';
 import { v4 as uuidv4 } from 'uuid';
-import { UserRole } from 'src/users/entities/users.entity';
 
 @Injectable()
 export class AuthService {
@@ -15,7 +14,7 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     private readonly configService: ConfigService,
-  ) { }
+  ) {}
 
   async register(registerDto: RegisterDto) {
     const existingUser = await this.usersService.findByEmail(registerDto.email);
@@ -50,7 +49,6 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('Пользователь не найден');
     }
-    console.log(user);
     const passwordMatch = await bcrypt.compare(
       loginDto.password,
       user.password,
