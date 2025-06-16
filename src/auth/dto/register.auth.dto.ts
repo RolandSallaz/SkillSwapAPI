@@ -9,7 +9,4 @@ export class RegisterDto extends PickType(CreateUsersDto, [
   'city',
   'aboutMe',
   'gender',
-  'skills',
-  'wantToLearn',
-  'favoriteSkills',
-] as const) {}
+] as const) { }

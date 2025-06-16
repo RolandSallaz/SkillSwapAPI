@@ -17,13 +17,14 @@ export interface JwtPayload {
 
 export interface AuthRequest extends Request {
   user: JwtPayload;
+}
 
 @Injectable()
 export class AccessTokenGuard implements CanActivate {
   constructor(
     private jwtService: JwtService,
     private readonly configService: ConfigService,
-  ) {}
+  ) { }
 
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<AuthRequest>();

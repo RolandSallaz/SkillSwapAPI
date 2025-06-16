@@ -21,5 +21,5 @@ logger.log(
       accessTokenSecret: process.env.JWT_ACCESS_SECRET,
       refreshTokenSecret: process.env.JWT_REFRESH_SECRET,
     },
-  }, null, 2)
-}`);
+  }, null, 2)}`
+);

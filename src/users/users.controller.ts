@@ -10,22 +10,17 @@ import {
   Req,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import {
   AccessTokenGuard,
   AuthRequest,
 } from '../auth/guards/accessToken.guard';
+import { CreateUsersDto } from './dto/create.users.dto';
+import { UpdateUsersDto } from './dto/update.users.dto';
 
 //Создание точки входа для работы с пользователями
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
-
-  @Post()
-  create(@Body() createUserDto: CreateUsersDto) {
-    return this.usersService.create(createUserDto);
-  }
 
   @Get()
   findAll() {
@@ -40,7 +35,7 @@ export class UsersController {
 
   @UseGuards(AccessTokenGuard)
   @Patch('me')
-  updateUser(@Req() req: AuthRequest, @Body() updateUserDto: UpdateUserDto) {
+  updateUser(@Req() req: AuthRequest, @Body() updateUserDto: UpdateUsersDto) {
     return this.usersService.updateUser(req.user.sub, updateUserDto);
   }
 

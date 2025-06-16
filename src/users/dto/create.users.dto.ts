@@ -1,3 +1,4 @@
+import { PartialType } from '@nestjs/mapped-types';
 import {
   IsEmail,
   IsEnum,
@@ -6,20 +7,12 @@ import {
   Min,
   Max,
   IsUUID,
+  IsOptional,
 } from 'class-validator';
-
-export enum Gender {
-  MALE = 'М',
-  FEMALE = 'Ж',
-}
-
-export enum UserRole {
-  USER = 'USER',
-  ADMIN = 'ADMIN',
-}
+import { Gender, User, UserRole } from '../entities/users.entity';
 
 // DTO для создания пользователя при передачи данных через API
-export class CreateUsersDto {
+export class CreateUsersDto extends PartialType(User) {
   @IsUUID()
   @IsNotEmpty()
   id: string;
@@ -47,20 +40,6 @@ export class CreateUsersDto {
 
   @IsEnum(Gender)
   gender: Gender;
-
-  //отдельный DTO для навыков
-  @IsString()
-  skills: string;
-
-  //отдельный DTO для категорий
-  @IsString()
-  wantToLearn: string;
-
-  @IsString()
-  favoriteSkills: string;
-
-  @IsEnum(UserRole)
-  role: UserRole;
 
   @IsString()
   refreshToken: string;

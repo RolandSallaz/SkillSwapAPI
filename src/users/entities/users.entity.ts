@@ -38,18 +38,22 @@ export class User {
   @Column()
   gender: Gender;
 
-  //отдельный entity для навыков
-  @Column()
-  skills: string;
+  // //отдельный entity для навыков
+  // @Column()
+  // skills: string;
 
-  //отдельный entity для категорий
-  @Column()
-  wantToLearn: string;
+  // //отдельный entity для категорий
+  // @Column()
+  // wantToLearn: string;
 
-  @Column()
-  favoriteSkills: string;
+  // @Column()
+  // favoriteSkills: string;
 
-  @Column({ default: 'user' })
+  @Column({
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.USER,
+  })
   role: UserRole;
 
   @Column()
