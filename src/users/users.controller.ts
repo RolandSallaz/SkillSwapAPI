@@ -12,13 +12,10 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
-import { JwtPayload } from '../auth/guards/accessToken.guard';
-import { Request } from 'express';
-
-export interface RequestWithUser extends Request {
-  user: JwtPayload;
-}
+import {
+  AccessTokenGuard,
+  AuthRequest,
+} from '../auth/guards/accessToken.guard';
 
 //Создание точки входа для работы с пользователями
 @Controller('users')
@@ -35,37 +32,31 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
-  }
-
   @UseGuards(AccessTokenGuard)
   @Get('me')
-  findCurrentUser(@Req() req: RequestWithUser) {
+  findCurrentUser(@Req() req: AuthRequest) {
     return this.usersService.findOne(req.user.sub);
   }
 
   @UseGuards(AccessTokenGuard)
   @Patch('me')
-  updateUser(
-    @Req() req: RequestWithUser,
-    @Body() updateUserDto: UpdateUserDto,
-  ) {
+  updateUser(@Req() req: AuthRequest, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.updateUser(req.user.sub, updateUserDto);
   }
 
   @UseGuards(AccessTokenGuard)
   @Patch('me/password')
-  updatePassword(
-    @Req() req: RequestWithUser,
-    @Body('password') password: string,
-  ) {
+  updatePassword(@Req() req: AuthRequest, @Body('password') password: string) {
     return this.usersService.updatePassword(req.user.sub, password);
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.usersService.findOne(id);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+    return this.usersService.remove(id);
   }
 }

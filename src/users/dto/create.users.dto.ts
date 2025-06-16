@@ -5,6 +5,7 @@ import {
   IsString,
   Min,
   Max,
+  IsUUID,
 } from 'class-validator';
 
 export enum Gender {
@@ -19,6 +20,10 @@ export enum UserRole {
 
 // DTO для создания пользователя при передачи данных через API
 export class CreateUsersDto {
+  @IsUUID()
+  @IsNotEmpty()
+  id: string;
+
   @IsString()
   @IsNotEmpty()
   name: string;
@@ -56,4 +61,7 @@ export class CreateUsersDto {
 
   @IsEnum(UserRole)
   role: UserRole;
+
+  @IsString()
+  refreshToken: string;
 }

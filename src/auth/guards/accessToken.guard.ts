@@ -6,20 +6,24 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
+import { ConfigService } from '@nestjs/config';
 
 // фейковая стуктура payload JWT токена
 export interface JwtPayload {
-  sub: number;
-  username: string;
+  sub: string;
+  email: string;
+  role: 'user' | 'admin';
 }
 
-interface AuthRequest extends Request {
-  user?: JwtPayload;
-}
+export interface AuthRequest extends Request {
+  user: JwtPayload;
 
 @Injectable()
 export class AccessTokenGuard implements CanActivate {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    private jwtService: JwtService,
+    private readonly configService: ConfigService,
+  ) {}
 
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<AuthRequest>();
@@ -33,7 +37,7 @@ export class AccessTokenGuard implements CanActivate {
 
     try {
       const payload = this.jwtService.verify<JwtPayload>(token, {
-        secret: 'access-secret', // фейковый секретный ключ для токена
+        secret: this.configService.get<string>('jwt.accessTokenSecret'),
       });
 
       request.user = payload;
