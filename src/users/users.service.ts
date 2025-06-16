@@ -15,7 +15,6 @@ export class UsersService {
     const user = await this.userRepository.save(createUserDto);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, refreshToken, ...userWithoutPassword } = user;
-
     return userWithoutPassword;
   }
 
@@ -33,7 +32,6 @@ export class UsersService {
     const user = await this.userRepository.findOneByOrFail({ id });
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, refreshToken, ...userWithoutPassword } = user;
-
     return userWithoutPassword;
   }
 
@@ -45,7 +43,6 @@ export class UsersService {
     });
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, refreshToken, ...userWithoutPassword } = updatedUser;
-
     return userWithoutPassword;
   }
 
@@ -58,7 +55,6 @@ export class UsersService {
     });
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, refreshToken, ...userWithoutPassword } = updatedUser;
-
     return userWithoutPassword;
   }
 
