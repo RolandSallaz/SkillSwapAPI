@@ -1,8 +1,18 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import * as cookieParser from 'cookie-parser';
+import { ConfigService } from '@nestjs/config';
+import { logger } from './config/mainLogger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  await app.listen(process.env.PORT ?? 3000);
+  const configService = app.get(ConfigService);
+  app.use(cookieParser());
+  const port = configService.get<number>('port') as number;
+  await app.listen(port);
+  logger.log(`app listen port: ${port}`);
 }
-bootstrap();
+bootstrap().catch((err) => {
+  logger.error(err);
+  process.exit(1);
+});
