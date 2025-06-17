@@ -8,7 +8,8 @@ import {
   Max,
   Min,
 } from 'class-validator';
-import { Gender, User } from '../entities/users.entity';
+import { User } from '../entities/users.entity';
+import { Gender } from '../enums'
 
 // DTO для создания пользователя при передачи данных через API
 export class CreateUsersDto extends PartialType(User) {

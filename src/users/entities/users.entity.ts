@@ -1,14 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
-
-export enum Gender {
-  MALE = 'М',
-  FEMALE = 'Ж',
-}
-
-export enum UserRole {
-  USER = 'user',
-  ADMIN = 'admin',
-}
+import {Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToMany, JoinTable} from 'typeorm';
+import {Skill} from "../../skills/entities/skill.entity";
+import { Gender, UserRole } from '../enums'
 
 //Данные пользователя для базы
 @Entity()
@@ -35,19 +27,24 @@ export class User {
   @Column()
   aboutMe: string;
 
-  @Column()
+  @Column({
+    type: 'enum',
+    enum: Gender,
+  })
   gender: Gender;
 
-  // //отдельный entity для навыков
-  // @Column()
-  // skills: string;
+  // Навыки, созданные пользователем
+  @OneToMany(() => Skill, (skill) => skill.owner)
+  skills: Skill[];
 
   // //отдельный entity для категорий
   // @Column()
   // wantToLearn: string;
 
-  // @Column()
-  // favoriteSkills: string;
+  // Навыки, добавленные в избранное
+  @ManyToMany(() => Skill, { eager: true })
+  @JoinTable()
+  favoriteSkills: Skill[];
 
   @Column({
     type: 'enum',
