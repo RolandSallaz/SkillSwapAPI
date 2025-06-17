@@ -1,5 +1,5 @@
 import * as dotenv from 'dotenv';
-import { logger } from './mainLogger';
+import { logger } from '../logger/mainLogger';
 dotenv.config();
 
 export default () => ({
