@@ -10,11 +10,15 @@ import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class AuthService {
+  private readonly saltRounds: number;
+
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
     private readonly configService: ConfigService,
-  ) {}
+  ) {
+    this.saltRounds = this.configService.get<number>('salt') as number;
+  }
 
   async register(registerDto: RegisterDto) {
     const existingUser = await this.usersService.findByEmail(registerDto.email);
@@ -23,13 +27,19 @@ export class AuthService {
         'Пользователь с таким email уже существует',
       );
     }
-    const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+    const hashedPassword = await bcrypt.hash(
+      registerDto.password,
+      this.saltRounds,
+    );
     const id = uuidv4();
     const tokens = await this._getTokens({
       id,
       email: registerDto.email,
     });
-    const hashedRefreshToken = await bcrypt.hash(tokens.refreshToken, 10);
+    const hashedRefreshToken = await bcrypt.hash(
+      tokens.refreshToken,
+      this.saltRounds,
+    );
     const newUser = await this.usersService.create({
       ...registerDto,
       password: hashedPassword,
@@ -65,7 +75,10 @@ export class AuthService {
 
   async refresh(user: { id: string; email: string; role?: string }) {
     const tokens = await this._getTokens(user);
-    const hashedRefreshToken = await bcrypt.hash(tokens.refreshToken, 10);
+    const hashedRefreshToken = await bcrypt.hash(
+      tokens.refreshToken,
+      this.saltRounds,
+    );
     const updatedUser = await this.usersService.updateUser(user.id, {
       refreshToken: hashedRefreshToken,
     });

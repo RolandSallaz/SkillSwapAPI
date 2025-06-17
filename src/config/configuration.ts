@@ -10,6 +10,7 @@ export default () => ({
     accessTokenSecret: process.env.JWT_ACCESS_SECRET || 'accessToken',
     refreshTokenSecret: process.env.JWT_REFRESH_SECRET || 'refreshToken',
   },
+  salt: Number(process.env.BCRYPT_SALT_ROUNDS) || 10,
 });
 
 logger.log(
