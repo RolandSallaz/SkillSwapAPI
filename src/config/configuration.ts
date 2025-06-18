@@ -11,6 +11,7 @@ export default () => ({
     refreshTokenSecret: process.env.JWT_REFRESH_SECRET || 'refreshToken',
   },
   salt: Number(process.env.BCRYPT_SALT_ROUNDS) || 10,
+  limitWeightImage: process.env || '2мб',
 });
 
 logger.log(
