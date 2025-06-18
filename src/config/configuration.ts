@@ -1,5 +1,5 @@
 import * as dotenv from 'dotenv';
-import { logger } from '../logger/mainLogger';
+import { logger } from 'src/logger/mainLogger';
 dotenv.config();
 
 export default () => ({
@@ -12,7 +12,7 @@ export default () => ({
   },
 });
 
-logger.log(
+logger.info(
   `Проверка подгрузки env ${JSON.stringify(
     {
       port: process.env.PORT,
