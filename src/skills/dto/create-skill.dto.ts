@@ -16,8 +16,4 @@ export class CreateSkillDto {
   @IsArray()
   @IsString({ each: true })
   images: string[];
-
-  @IsUUID()
-  @IsNotEmpty()
-  owner: string;
 }

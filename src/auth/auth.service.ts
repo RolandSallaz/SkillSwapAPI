@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.auth.dto';
 import { UsersService } from '../users/users.service';
@@ -21,12 +21,6 @@ export class AuthService {
   }
 
   async register(registerDto: RegisterDto) {
-    const existingUser = await this.usersService.findByEmail(registerDto.email);
-    if (existingUser) {
-      throw new UnauthorizedException(
-        'Пользователь с таким email уже существует',
-      );
-    }
     const hashedPassword = await bcrypt.hash(
       registerDto.password,
       this.saltRounds,
@@ -57,7 +51,7 @@ export class AuthService {
   async login(loginDto: LoginDto) {
     const user = await this.usersService.findByEmail(loginDto.email);
     if (!user) {
-      throw new UnauthorizedException('Пользователь не найден');
+      throw new NotFoundException('Пользователь не найден');
     }
     const passwordMatch = await bcrypt.compare(
       loginDto.password,

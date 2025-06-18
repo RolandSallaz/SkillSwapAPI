@@ -46,7 +46,7 @@ export class AccessTokenGuard implements CanActivate {
       console.log('JWT payload:', payload);
       request.user = payload;
     } catch {
-      throw new UnauthorizedException('Требуется авторизацияdd');
+      throw new UnauthorizedException('Требуется авторизация');
     }
     return true;
   }

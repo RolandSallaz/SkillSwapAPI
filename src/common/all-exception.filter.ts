@@ -21,7 +21,7 @@ export class AllExceptionFilter implements ExceptionFilter {
         message: 'Cущность не найдена',
       });
     }
-
+    console.log(exception);
     if (
       typeof exception === 'object' &&
       exception !== null &&
