@@ -29,11 +29,7 @@ export class AllExceptionFilter implements ExceptionFilter {
         message: 'Cущность не найдена',
       });
     }
-<<<<<<< HEAD
-    console.log(exception);
-=======
-
->>>>>>> 08ea385 (add filter)
+    
     if (
       typeof exception === 'object' &&
       exception !== null &&

@@ -6,11 +6,8 @@ import {
   Patch,
   Param,
   Delete,
-<<<<<<< HEAD
   UseGuards,
   Req,
-=======
->>>>>>> 9c22d9d (add Swagger)
 } from '@nestjs/common';
 import { SkillsService } from './skills.service';
 import { CreateSkillDto } from './dto/create-skill.dto';
