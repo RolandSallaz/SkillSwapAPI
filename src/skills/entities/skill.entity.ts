@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { User } from '../../users/entities/users.entity';
 
 @Entity()
 export class Skill {
@@ -8,15 +9,19 @@ export class Skill {
   @Column()
   title: string;
 
-  @Column()
+  @Column({ nullable: true, type: 'text' })
   description: string;
 
-  @Column('uuid')
-  category: string; //связь с категорией
+  // @Column()
+  // category: string;
 
-  @Column('text', { array: true })
+  @Column('text', { array: true, nullable: true })
   images: string[];
 
-  @Column()
-  owner: string; //связь с пользователем
+  @ManyToOne(() => User, (user) => user.skills, {
+    nullable: true,
+    eager: true,
+    onDelete: 'CASCADE',
+  })
+  owner: User;
 }

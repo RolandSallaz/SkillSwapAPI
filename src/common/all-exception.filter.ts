@@ -45,7 +45,7 @@ export class AllExceptionFilter implements ExceptionFilter {
     ) {
       return response.status(HttpStatus.PAYLOAD_TOO_LARGE).json({
         statusCode: HttpStatus.PAYLOAD_TOO_LARGE,
-        message: `Вес файла не должен превышать ${this.configService.get<string>('limitWeightImage')}`,
+        message: `Вес файла не должен превышать ${this.configService.get<string>('upload.fileSizeMax')} MБ`,
       });
     }
 

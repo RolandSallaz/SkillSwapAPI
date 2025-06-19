@@ -9,8 +9,9 @@ import {
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.auth.dto';
 import { RefreshTokenGuard } from './guards/refreshToken.guard';
-import { AccessTokenGuard, AuthRequest } from './guards/accessToken.guard';
+import { AccessTokenGuard } from './guards/accessToken.guard';
 import { RegisterDto } from './dto/register.auth.dto';
+import { AuthRequest } from './types';
 
 @Controller('auth')
 export class AuthController {
