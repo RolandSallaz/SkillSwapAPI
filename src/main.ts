@@ -4,6 +4,7 @@ import * as cookieParser from 'cookie-parser';
 import { ConfigService } from '@nestjs/config';
 import { WinstonLoggerService } from './logger/winston-logger.service';
 import { logger } from './logger/mainLogger';
+import { HttpLoggerMiddleware } from './middleware/http-logger.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -11,6 +12,7 @@ async function bootstrap() {
   });
   const configService = app.get(ConfigService);
   app.use(cookieParser());
+  app.use(new HttpLoggerMiddleware().use);
   const port = configService.get<number>('port') as number;
   await app.listen(port);
   logger.info(`app listen port: ${port}`);
