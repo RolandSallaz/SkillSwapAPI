@@ -1,7 +1,9 @@
 import { createLogger, format, transports } from 'winston';
 import * as fs from 'fs';
 import * as path from 'path';
-
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+import DailyRotateFile = require('winston-daily-rotate-file');
+import 'winston-daily-rotate-file';
 const logDirectory = path.join(process.cwd(), 'logs');
 
 if (!fs.existsSync(logDirectory)) {
@@ -41,16 +43,24 @@ export const logger = createLogger({
   level: 'silly',
 
   transports: [
-    new transports.File({
-      filename: path.join(logDirectory, 'all.log'),
-
+    // --- (all.log) ---
+    new DailyRotateFile({
+      filename: path.join(logDirectory, 'all-%DATE%.log'),
+      datePattern: 'YYYY-MM-DD',
+      zippedArchive: true,
+      maxSize: '20m',
+      maxFiles: '14d',
       level: 'silly',
       format: fileLogFormat,
     }),
 
-    new transports.File({
-      filename: path.join(logDirectory, 'error_warn.log'),
-
+    // --- (error_warn.log)---
+    new DailyRotateFile({
+      filename: path.join(logDirectory, 'error_warn-%DATE%.log'),
+      datePattern: 'YYYY-MM-DD',
+      zippedArchive: true,
+      maxSize: '10m',
+      maxFiles: '30d',
       level: 'warn',
       format: fileLogFormat,
     }),
