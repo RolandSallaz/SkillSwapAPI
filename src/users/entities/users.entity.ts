@@ -1,6 +1,13 @@
-import {Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToMany, JoinTable} from 'typeorm';
-import {Skill} from "../../skills/entities/skill.entity";
-import { Gender, UserRole } from '../enums'
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
+import { Skill } from '../../skills/entities/skill.entity';
+import { Gender, UserRole } from '../enums';
 
 //Данные пользователя для базы
 @Entity()

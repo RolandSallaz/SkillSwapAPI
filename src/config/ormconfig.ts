@@ -1,6 +1,6 @@
 import { DataSource } from 'typeorm';
 import * as dotenv from 'dotenv';
-import * as process from "node:process";
+import * as process from 'node:process';
 dotenv.config();
 
 export const AppDataSource = new DataSource({

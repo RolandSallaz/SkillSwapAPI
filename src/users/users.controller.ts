@@ -11,7 +11,7 @@ import {
 import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
 import { UpdateUsersDto } from './dto/update.users.dto';
 import { UsersService } from './users.service';
-import { AuthRequest } from '../auth/types'
+import { AuthRequest } from '../auth/types';
 
 //Создание точки входа для работы с пользователями
 @Controller('users')

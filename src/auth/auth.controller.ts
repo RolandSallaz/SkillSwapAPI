@@ -11,7 +11,7 @@ import { LoginDto } from './dto/login.auth.dto';
 import { RefreshTokenGuard } from './guards/refreshToken.guard';
 import { AccessTokenGuard } from './guards/accessToken.guard';
 import { RegisterDto } from './dto/register.auth.dto';
-import { AuthRequest } from './types'
+import { AuthRequest } from './types';
 
 @Controller('auth')
 export class AuthController {
