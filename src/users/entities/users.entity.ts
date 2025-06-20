@@ -60,6 +60,10 @@ export class User {
   })
   role: UserRole;
 
-  @Column()
+  @Column({
+    type: 'varchar2',
+    nullable: true,
+    default: null,
+  })
   refreshToken: string;
 }
