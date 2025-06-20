@@ -20,7 +20,6 @@ export class Skill {
 
   @ManyToOne(() => User, (user) => user.skills, {
     nullable: true,
-    eager: true,
     onDelete: 'CASCADE',
   })
   owner: User;

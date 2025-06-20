@@ -10,11 +10,16 @@ import {
 } from 'class-validator';
 import { User } from '../entities/users.entity';
 import { Gender } from '../enums';
+import { ApiProperty } from '@nestjs/swagger';
 
 // DTO для создания пользователя при передачи данных через API
 export class CreateUsersDto extends PartialType(User) {
   @IsUUID()
   @IsNotEmpty()
+  @ApiProperty({
+    example: 1,
+    description: 'Уникальный идентификатор пользователя',
+  })
   id: string;
 
   @IsString()

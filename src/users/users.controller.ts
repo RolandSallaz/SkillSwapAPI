@@ -12,6 +12,7 @@ import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
 import { UpdateUsersDto } from './dto/update.users.dto';
 import { UsersService } from './users.service';
 import { AuthRequest } from '../auth/types';
+import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 //Создание точки входа для работы с пользователями
 @Controller('users')
@@ -19,6 +20,11 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
+  @ApiOperation({ summary: 'Получение всех пользователей' })
+  @ApiResponse({
+    status: 200,
+    description: 'Список пользователей',
+  })
   findAll() {
     return this.usersService.findAll();
   }
