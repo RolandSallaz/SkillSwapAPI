@@ -5,7 +5,7 @@ import {
   // Body,
   // Patch,
   Param,
-  Delete
+  Delete,
 } from '@nestjs/common';
 import { SkillsService } from './skills.service';
 // import { CreateSkillDto } from './dto/create-skill.dto';
@@ -19,7 +19,6 @@ export class SkillsController {
   // create(@Body() createSkillDto: CreateSkillDto) {
   //   return this.skillsService.create(createSkillDto);
   // }
-
   @Get()
   findAll() {
     return this.skillsService.findAll();
