@@ -5,7 +5,7 @@ import {
 import { logger } from './mainLogger';
 
 // ANSI escape-коды для цветов
-const colors = {
+export const colors = {
   reset: '\x1b[0m', // Сброс всех атрибутов
   bright: '\x1b[1m', // Яркий/жирный
   dim: '\x1b[2m', // Тусклый

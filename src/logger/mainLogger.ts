@@ -4,16 +4,17 @@ import * as path from 'path';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 import DailyRotateFile = require('winston-daily-rotate-file');
 import 'winston-daily-rotate-file';
+import { colors } from './winston-logger.service';
 const logDirectory = path.join(process.cwd(), 'logs');
 
 if (!fs.existsSync(logDirectory)) {
   fs.mkdirSync(logDirectory);
 }
 
-const removeAnsiCodes = format((info) => {
-  // eslint-disable-next-line no-control-regex
-  const ansiRegex = /\x1b\[[0-9;]*m/g;
+// eslint-disable-next-line no-control-regex
+const ansiRegex = /\x1b\[[0-9;]*m/g;
 
+const removeAnsiCodes = format((info) => {
   if (typeof info.message === 'string') {
     info.message = info.message.replace(ansiRegex, '');
   }
@@ -23,6 +24,18 @@ const removeAnsiCodes = format((info) => {
 
   return info;
 });
+
+function myStartsWithCaseSensitive(
+  mainString: string,
+  prefix: string,
+): boolean {
+  if (mainString.length < prefix.length) {
+    return false;
+  }
+
+  const extractedPrefix = mainString.replace(ansiRegex, '').slice(0, 4);
+  return extractedPrefix === prefix;
+}
 
 const fileLogFormat = format.combine(
   format.timestamp({ format: 'DD.MM.YYYY, HH:mm:ss' }),
@@ -35,7 +48,11 @@ const consoleLogFormat = format.combine(
   format.timestamp({ format: 'DD.MM.YYYY, HH:mm:ss' }),
   format.printf((info) => {
     const { timestamp, level, message } = info;
-    return `[${level}] ${String(timestamp)}  ${String(message)}`;
+    const stringMessage = String(message);
+
+    if (myStartsWithCaseSensitive(stringMessage, 'HTTP')) {
+      return `${colors.fgYellow}[http]${colors.reset} ${String(timestamp)}  ${String(message)}`;
+    } else return `[${level}] ${String(timestamp)}  ${String(message)}`;
   }),
 );
 
