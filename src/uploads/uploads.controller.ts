@@ -20,8 +20,17 @@ export class UploadsController {
   constructor(private readonly uploadsService: UploadsService) {}
 
   @Post('upload')
-  @UseInterceptors(fileInterceptor(uploadsConfiguration))
-  async uploadFile(
+  @ApiOperation({ summary: 'Загрузка изображения на сервер' })
+  @ApiResponse({
+    status: 200,
+    description: 'Ссылка на загруженный файл',
+    type: UploadedImageFileDTO,
+    isArray: false,
+  })
+  @ApiBearerAuth()
+  @UseGuards(AccessTokenGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadImageFile(
     @UploadedFile() file: { path: string; originalname: string },
     @Res() res: Response,
   ) {
