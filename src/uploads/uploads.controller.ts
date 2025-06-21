@@ -6,35 +6,18 @@ import {
   Res,
   HttpException,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
-import { fileInterceptor, UploadsConfiguration } from './middleware/file';
 import { Response } from 'express';
 import { UploadsService } from './uploads.service';
-import { ConfigService } from '@nestjs/config';
-
-const uploadsConfiguration: UploadsConfiguration = {
-  fileSizeMax: 0,
-  dir: './public/uploads',
-  logError: console.log,
-};
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
+import { UploadedImageFileDTO } from './dto/upload.image.file.dto';
 
 @Controller('uploads')
 export class UploadsController {
-  constructor(
-    private readonly uploadsService: UploadsService,
-    private readonly configService: ConfigService,
-  ) {
-    uploadsConfiguration.dir = this.configService.get<string>(
-      'upload.dir',
-      './public/uploads',
-    );
-    uploadsConfiguration.fileSizeMax = this.configService.get<number>(
-      'upload.fileSizeMax',
-      2 * 1024 * 1024,
-    );
-    // TODO: добавить в зависимости логгер и передать сюда его функцию
-    // uploadsConfiguration.logerror = this.logger.error или типа того
-  }
+  constructor(private readonly uploadsService: UploadsService) {}
 
   @Post('upload')
   @UseInterceptors(fileInterceptor(uploadsConfiguration))
