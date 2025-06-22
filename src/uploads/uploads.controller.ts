@@ -9,9 +9,15 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { UploadsService } from './uploads.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiResponse,
+} from '@nestjs/swagger';
+import { UploadsService } from './uploads.service';
 import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
 import { UploadedImageFileDTO } from './dto/upload.image.file.dto';
 
@@ -21,6 +27,18 @@ export class UploadsController {
 
   @Post('upload')
   @ApiOperation({ summary: 'Загрузка изображения на сервер' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
   @ApiResponse({
     status: 201,
     description: 'Ссылка на загруженный файл',
@@ -28,7 +46,7 @@ export class UploadsController {
     isArray: false,
   })
   @ApiBearerAuth()
-  // @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard)
   @UseInterceptors(FileInterceptor('file'))
   async uploadImageFile(
     @UploadedFile() file: { path: string; originalname: string },
