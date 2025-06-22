@@ -10,6 +10,7 @@ import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { AccessTokenGuard } from './auth/guards/accessToken.guard';
 import { SkillsModule } from './skills/skills.module';
+import { UploadsModule } from './uploads/uploads.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { SkillsModule } from './skills/skills.module';
     UsersModule,
     AuthModule,
     SkillsModule,
+    UploadsModule,
   ],
   controllers: [AppController],
   providers: [AppService, AccessTokenGuard],
