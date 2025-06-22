@@ -6,19 +6,13 @@ import {
   PayloadTooLargeException,
   HttpException,
 } from '@nestjs/common';
-<<<<<<< HEAD
 import { ConfigService } from '@nestjs/config';
-=======
->>>>>>> 08ea385 (add filter)
 import { Response } from 'express';
 import { EntityNotFoundError } from 'typeorm/error/EntityNotFoundError';
 
 @Catch()
 export class AllExceptionFilter implements ExceptionFilter {
-<<<<<<< HEAD
   constructor(private readonly configService: ConfigService) {}
-=======
->>>>>>> 08ea385 (add filter)
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
@@ -29,7 +23,7 @@ export class AllExceptionFilter implements ExceptionFilter {
         message: 'Cущность не найдена',
       });
     }
-    
+
     if (
       typeof exception === 'object' &&
       exception !== null &&

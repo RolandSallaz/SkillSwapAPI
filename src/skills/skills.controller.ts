@@ -12,11 +12,8 @@ import {
 import { SkillsService } from './skills.service';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
-import {
-  AccessTokenGuard,
-  AuthRequest,
-} from 'src/auth/guards/accessToken.guard';
-
+import { AccessTokenGuard } from 'src/auth/guards/accessToken.guard';
+import { AuthRequest } from 'src/auth/types';
 @Controller('skills')
 export class SkillsController {
   constructor(private readonly skillsService: SkillsService) {}
