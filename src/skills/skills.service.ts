@@ -4,6 +4,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Skill } from './entities/skill.entity';
 import { Repository } from 'typeorm';
 import { UpdateSkillDto } from './dto/update-skill.dto';
+import { unlink } from 'node:fs';
+import * as path from 'path';
 
 @Injectable()
 export class SkillsService {
@@ -27,17 +29,33 @@ export class SkillsService {
   }
 
   async update(userId: string, id: string, updateSkillDto: UpdateSkillDto) {
-    const skill = await this.skillRepository.findOneByOrFail({ id });
-    if (skill.owner !== userId) {
-      throw new ForbiddenException('Недостаточно прав');
-    }
+    const skill = await this.userIsOwner(id, userId);
     return await this.skillRepository.save({
       ...skill,
       ...updateSkillDto,
     });
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} skill`;
+  async remove(id: string, userId: string) {
+    const skill = await this.userIsOwner(id, userId);
+    skill.images.forEach((image) => {
+      const relativePath = image.startsWith('/') ? image.slice(1) : image;
+      const absolutePath = path.join(process.cwd(), relativePath);
+      unlink(absolutePath, (err) => {
+        if (err) {
+          console.error(`Ошибка при удалении файла ${absolutePath}:`, err);
+        }
+      });
+    });
+    await this.skillRepository.delete(id);
+    return;
+  }
+
+  async userIsOwner(id: string, userId: string) {
+    const skill = await this.skillRepository.findOneByOrFail({ id });
+    if (skill.owner !== userId) {
+      throw new ForbiddenException('Недостаточно прав');
+    }
+    return skill;
   }
 }
