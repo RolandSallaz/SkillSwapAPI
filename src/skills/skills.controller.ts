@@ -8,6 +8,7 @@ import {
   Delete,
   Query,
 } from '@nestjs/common';
+import { FindSkillsQueryDto } from './dto/find-skill.dto';
 import { SkillsService } from './skills.service';
 // import { CreateSkillDto } from './dto/create-skill.dto';
 // import { UpdateSkillDto } from './dto/update-skill.dto';
@@ -21,12 +22,8 @@ export class SkillsController {
   //   return this.skillsService.create(createSkillDto);
   // }
   @Get()
-  findAll(
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
-    @Query('search') search?: string,
-  ) {
-    return this.skillsService.findAll({ page, limit, search });
+  find(@Query() query: FindSkillsQueryDto) {
+    return this.skillsService.find(query);
   }
 
   @Get(':id')

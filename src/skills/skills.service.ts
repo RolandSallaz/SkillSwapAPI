@@ -16,14 +16,15 @@ export class SkillsService {
     private readonly skillRepository: Repository<Skill>,
   ) {}
 
-  async findAll(query: { page?: string; limit?: string; search?: string }) {
-    const page = parseInt(query.page ?? '1') || 1;
-    const limit = parseInt(query.limit ?? '20') || 20;
-    const search = (query.search || '').toLowerCase();
+  async find(query: { page?: string; limit?: string; search?: string }) {
+    const page = Math.max(parseInt(query.page ?? '1'), 1);
+    const limit = Math.min(Math.max(parseInt(query.limit ?? '20'), 1), 100);
+    const search = (query.search || '').trim().toLowerCase();
+    const qb = this.skillRepository.createQueryBuilder('skill');
 
-    const qb = this.skillRepository
-      .createQueryBuilder('skill')
-      .where('LOWER(skill.title) LIKE :search', { search: `%${search}%` });
+    if (search) {
+      qb.where('LOWER(skill.title) LIKE :search', { search: `%${search}%` });
+    }
 
     const [skills, total] = await qb
       .skip((page - 1) * limit)
