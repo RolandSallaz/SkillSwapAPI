@@ -22,13 +22,13 @@ export class UploadsController {
   @Post('upload')
   @ApiOperation({ summary: 'Загрузка изображения на сервер' })
   @ApiResponse({
-    status: 200,
+    status: 201,
     description: 'Ссылка на загруженный файл',
     type: UploadedImageFileDTO,
     isArray: false,
   })
   @ApiBearerAuth()
-  @UseGuards(AccessTokenGuard)
+  // @UseGuards(AccessTokenGuard)
   @UseInterceptors(FileInterceptor('file'))
   async uploadImageFile(
     @UploadedFile() file: { path: string; originalname: string },
@@ -37,8 +37,10 @@ export class UploadsController {
     if (!file) {
       throw new HttpException('Файл не загружен', HttpStatus.BAD_REQUEST);
     }
-    return res.json(
-      await this.uploadsService.prepareFile(file.path, file.originalname),
-    );
+    return res
+      .status(HttpStatus.CREATED)
+      .json(
+        await this.uploadsService.prepareFile(file.path, file.originalname),
+      );
   }
 }
