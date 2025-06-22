@@ -16,7 +16,7 @@ export class SkillsService {
   async create(userId: string, createSkillDto: CreateSkillDto) {
     return await this.skillRepository.save({
       ...createSkillDto,
-      owner: userId,
+      owner: { id: userId },
     });
   }
 
@@ -48,12 +48,12 @@ export class SkillsService {
       });
     });
     await this.skillRepository.delete(id);
-    return;
+    return `Skill with id ${id} has been removed`;
   }
 
   async userIsOwner(id: string, userId: string) {
     const skill = await this.skillRepository.findOneByOrFail({ id });
-    if (skill.owner !== userId) {
+    if (skill.owner.id !== userId) {
       throw new ForbiddenException('Недостаточно прав');
     }
     return skill;
