@@ -63,7 +63,7 @@ export class UsersController {
   @ApiResponse({
     status: 200,
     description: 'Данные текущего пользователя',
-    type: UpdateUsersDto,
+    type: FindUserDTO,
   })
   updateUser(@Req() req: AuthRequest, @Body() updateUserDto: UpdateUsersDto) {
     return this.usersService.updateUser(req.user.sub, updateUserDto);

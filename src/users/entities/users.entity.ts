@@ -8,40 +8,57 @@ import {
 } from 'typeorm';
 import { Skill } from '../../skills/entities/skill.entity';
 import { Gender, UserRole } from '../enums';
+import { ApiProperty } from '@nestjs/swagger';
+import { Exclude } from 'class-transformer';
 
 //Данные пользователя для базы
 @Entity()
 export class User {
   @PrimaryGeneratedColumn('uuid')
+  @ApiProperty({
+    example: 1,
+    description: 'Уникальный идентификатор пользователя',
+  })
   id: string;
 
   @Column({ length: 100 })
+  @ApiProperty({ example: 'alex', description: 'Имя пользователя' })
   name: string;
 
   @Column({ unique: true })
+  @ApiProperty({
+    example: 'alex@example.com',
+    description: 'Email пользователя',
+  })
   email: string;
 
   @Column()
+  @ApiProperty({ example: 'password', description: 'Пароль' })
   password: string;
 
   @Column()
+  @ApiProperty({ example: 30, description: 'Возраст' })
   age: number;
 
   @Column()
+  @ApiProperty({ example: 'New York', description: 'Город' })
   city: string;
 
   //о себе
   @Column()
+  @ApiProperty({ example: 'О себе', description: 'Информация о себе' })
   aboutMe: string;
 
   @Column({
     type: 'enum',
     enum: Gender,
   })
+  @ApiProperty({ example: Gender.MALE, enum: Gender, description: 'Пол' })
   gender: Gender;
 
   // Навыки, созданные пользователем
   @OneToMany(() => Skill, (skill) => skill.owner)
+  @ApiProperty({ type: () => [Skill], description: 'Навыки пользователя' })
   skills: Skill[];
 
   // //отдельный entity для категорий
@@ -51,6 +68,11 @@ export class User {
   // Навыки, добавленные в избранное
   @ManyToMany(() => Skill, { eager: true })
   @JoinTable()
+  @ApiProperty({
+    example: 'favoriteSkills',
+    enum: Gender,
+    description: 'favoriteSkills',
+  })
   favoriteSkills: Skill[];
 
   @Column({
@@ -61,5 +83,6 @@ export class User {
   role: UserRole;
 
   @Column()
+  @ApiProperty({ example: 'refresh_token_value', description: 'Refresh Token' })
   refreshToken: string;
 }

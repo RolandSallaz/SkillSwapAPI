@@ -76,7 +76,8 @@ export class AuthService {
   }
 
   async logout(id: string) {
-    return await this.usersService.removeRefreshToken(id);
+    await this.usersService.removeRefreshToken(id);
+    return 'Пользователь успешно вышел из системы';
   }
 
   async _getTokens(user: { id: string; email: string; role?: string }) {
