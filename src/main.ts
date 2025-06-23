@@ -2,15 +2,20 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as cookieParser from 'cookie-parser';
 import { ConfigService } from '@nestjs/config';
-import { logger } from './config/mainLogger';
+import { WinstonLoggerService } from './logger/winston-logger.service';
+import { logger } from './logger/mainLogger';
+import { HttpLoggerMiddleware } from './logger/http-logger.middleware';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: new WinstonLoggerService(),
+  });
   const configService = app.get(ConfigService);
 
   app.use(cookieParser());
+  app.use(new HttpLoggerMiddleware().use);
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -37,7 +42,7 @@ async function bootstrap() {
   SwaggerModule.setup('api/doc', app, documentFactory);
   const port = configService.get<number>('port') as number;
   await app.listen(port);
-  logger.log(`app listen port: ${port}`);
+  logger.info(`app listen port: ${port}`);
 }
 bootstrap().catch((err) => {
   logger.error(err);
