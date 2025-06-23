@@ -60,7 +60,7 @@ export class AuthController {
     type: LoginDto,
   })
   @ApiResponse({
-    status: 201,
+    status: 200,
     description: 'Успешная авторизация',
     type: AuthResponseDto,
   })
@@ -77,7 +77,7 @@ export class AuthController {
       'Используется для получения новых токенов доступа и обновления refresh токена',
   })
   @ApiResponse({
-    status: 201,
+    status: 200,
     description: 'Успешное обновление токенов',
     type: AuthResponseDto,
   })
@@ -98,9 +98,14 @@ export class AuthController {
     description: 'Удаляет refresh токен пользователя и завершает сессию',
   })
   @ApiResponse({
-    status: 201,
+    status: 200,
     description: 'Успешный выход из системы',
-    type: AuthResponseDto,
+    schema: {
+      example: {
+        message:
+          'Пользователь с id e59c23dc-b405-4eae-9bae-c8e3a2078d44 вышёл из системы',
+      },
+    },
   })
   @HttpCode(200)
   logout(@Req() req: AuthRequest) {

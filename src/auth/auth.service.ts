@@ -57,19 +57,26 @@ export class AuthService {
       throw new UnauthorizedException('Неверный email или пароль');
     }
     return await this.refresh({
+      message: 'Авторизация прошла успешно',
       id: user.id,
       email: user.email,
       role: user.role,
     });
   }
 
-  async refresh(user: { id: string; email: string; role?: string }) {
+  async refresh(user: {
+    id: string;
+    email: string;
+    role?: string;
+    message?: string;
+  }) {
     const tokens = await this._getTokens(user);
     const hashedRefreshToken = await bcrypt.hash(tokens.refreshToken, 10);
     const updatedUser = await this.usersService.updateUser(user.id, {
       refreshToken: hashedRefreshToken,
     });
     return {
+      message: user.message || 'Рефреш токена прошёл успешно',
       ...tokens,
       user: updatedUser,
     };

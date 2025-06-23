@@ -33,7 +33,6 @@ export class User {
   email: string;
 
   @Column()
-  @ApiProperty({ example: 'password', description: 'Пароль' })
   password: string;
 
   @Column()
@@ -80,9 +79,13 @@ export class User {
     enum: UserRole,
     default: UserRole.USER,
   })
+  @ApiProperty({
+    example: UserRole.USER,
+    enum: UserRole,
+    description: 'Роль пользователя',
+  })
   role: UserRole;
 
   @Column()
-  @ApiProperty({ example: 'refresh_token_value', description: 'Refresh Token' })
   refreshToken: string;
 }
