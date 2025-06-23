@@ -20,11 +20,6 @@ export class SkillsService {
     });
   }
 
-  constructor(
-    @InjectRepository(Skill)
-    private readonly skillRepository: Repository<Skill>,
-  ) {}
-
   async find(query: { page?: string; limit?: string; search?: string }) {
     const page = Math.max(parseInt(query.page ?? '1'), 1);
     const limit = Math.min(Math.max(parseInt(query.limit ?? '20'), 1), 100);
