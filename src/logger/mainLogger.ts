@@ -1,14 +1,16 @@
 import { createLogger, format, transports } from 'winston';
 import * as fs from 'fs';
 import * as path from 'path';
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-import DailyRotateFile = require('winston-daily-rotate-file');
+import { colors } from './codeColor';
 import 'winston-daily-rotate-file';
-import { colors } from './winston-logger.service';
 const logDirectory = path.join(process.cwd(), 'logs');
 
-if (!fs.existsSync(logDirectory)) {
-  fs.mkdirSync(logDirectory);
+try {
+  if (!fs.existsSync(logDirectory)) {
+    fs.mkdirSync(logDirectory);
+  }
+} catch (error) {
+  console.error(`Не удалось создать папку ${error}`);
 }
 
 // eslint-disable-next-line no-control-regex
@@ -61,7 +63,7 @@ export const logger = createLogger({
 
   transports: [
     // --- (all.log) ---
-    new DailyRotateFile({
+    new transports.DailyRotateFile({
       filename: path.join(logDirectory, 'all-%DATE%.log'),
       datePattern: 'YYYY-MM-DD',
       zippedArchive: true,
@@ -72,7 +74,7 @@ export const logger = createLogger({
     }),
 
     // --- (error_warn.log)---
-    new DailyRotateFile({
+    new transports.DailyRotateFile({
       filename: path.join(logDirectory, 'error_warn-%DATE%.log'),
       datePattern: 'YYYY-MM-DD',
       zippedArchive: true,

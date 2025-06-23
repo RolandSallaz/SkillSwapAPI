@@ -3,35 +3,7 @@ import {
   LoggerService as NestJsLoggerService,
 } from '@nestjs/common';
 import { logger } from './mainLogger';
-
-// ANSI escape-коды для цветов
-export const colors = {
-  reset: '\x1b[0m', // Сброс всех атрибутов
-  bright: '\x1b[1m', // Яркий/жирный
-  dim: '\x1b[2m', // Тусклый
-  underscore: '\x1b[4m', // Подчеркнутый
-  blink: '\x1b[5m', // Мигающий
-  reverse: '\x1b[7m', // Инверсия (цвет текста и фона меняются местами)
-  hidden: '\x1b[8m', // Скрытый текст
-
-  fgBlack: '\x1b[30m', // Цвет текста: Черный
-  fgRed: '\x1b[31m', // Цвет текста: Красный
-  fgGreen: '\x1b[32m', // Цвет текста: Зеленый
-  fgYellow: '\x1b[33m', // Цвет текста: Желтый
-  fgBlue: '\x1b[34m', // Цвет текста: Синий
-  fgMagenta: '\x1b[35m', // Цвет текста: Пурпурный
-  fgCyan: '\x1b[36m', // Цвет текста: Голубой
-  fgWhite: '\x1b[37m', // Цвет текста: Белый
-
-  bgBlack: '\x1b[40m', // Цвет фона: Черный
-  bgRed: '\x1b[41m', // Цвет фона: Красный
-  bgGreen: '\x1b[42m', // Цвет фона: Зеленый
-  bgYellow: '\x1b[43m', // Цвет фона: Желтый
-  bgBlue: '\x1b[44m', // Цвет фона: Синий
-  bgMagenta: '\x1b[45m', // Цвет фона: Пурпурный
-  bgCyan: '\x1b[46m', // Цвет фона: Голубой
-  bgWhite: '\x1b[47m', // Цвет фона: Белый
-};
+import { colors } from './codeColor';
 
 @Injectable()
 export class WinstonLoggerService implements NestJsLoggerService {
@@ -59,8 +31,7 @@ export class WinstonLoggerService implements NestJsLoggerService {
           if (typeof param === 'object' && param !== null) {
             try {
               return JSON.stringify(param, null, 2);
-              // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            } catch (e) {
+            } catch {
               return String(param);
             }
           }
@@ -73,33 +44,36 @@ export class WinstonLoggerService implements NestJsLoggerService {
     return fullLogMessage;
   }
 
-  log(message: any, ...optionalParams: any[]) {
+  private write(
+    level: 'info' | 'error' | 'warn' | 'debug' | 'verbose',
+    message: any,
+    optionalParams: any[],
+  ) {
     const formattedMessage = this.formatLogMessage(message, optionalParams);
-    logger.info(formattedMessage);
+    logger[level](formattedMessage);
+  }
+
+  log(message: any, ...optionalParams: any[]) {
+    this.write('info', message, optionalParams);
   }
 
   error(message: any, ...optionalParams: any[]) {
-    const formattedMessage = this.formatLogMessage(message, optionalParams);
-    logger.error(formattedMessage);
+    this.write('error', message, optionalParams);
   }
 
   warn(message: any, ...optionalParams: any[]) {
-    const formattedMessage = this.formatLogMessage(message, optionalParams);
-    logger.warn(formattedMessage);
+    this.write('warn', message, optionalParams);
   }
 
   debug?(message: any, ...optionalParams: any[]) {
-    const formattedMessage = this.formatLogMessage(message, optionalParams);
-    logger.debug(formattedMessage);
+    this.write('debug', message, optionalParams);
   }
 
   verbose?(message: any, ...optionalParams: any[]) {
-    const formattedMessage = this.formatLogMessage(message, optionalParams);
-    logger.verbose(formattedMessage);
+    this.write('verbose', message, optionalParams);
   }
 
   fatal?(message: any, ...optionalParams: any[]) {
-    const formattedMessage = this.formatLogMessage(message, optionalParams);
-    logger.error(formattedMessage);
+    this.write('error', message, optionalParams);
   }
 }

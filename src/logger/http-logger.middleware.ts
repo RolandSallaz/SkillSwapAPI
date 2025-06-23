@@ -20,11 +20,19 @@ export class HttpLoggerMiddleware implements NestMiddleware {
         userAgent: req.headers['user-agent'],
       };
 
-      logger.info(
-        `HTTP Request: ${req.method} ${req.originalUrl} - ${res.statusCode}`,
-        httpLogData,
-        'HTTP',
-      );
+      if (res.statusCode >= 400) {
+        logger.error(
+          `HTTP Request: ${req.method} ${req.originalUrl} - ${res.statusCode}`,
+          httpLogData,
+          'HTTP',
+        );
+      } else {
+        logger.info(
+          `HTTP Request: ${req.method} ${req.originalUrl} - ${res.statusCode}`,
+          httpLogData,
+          'HTTP',
+        );
+      }
     });
 
     next();
