@@ -1,5 +1,4 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
-import * as path from "path";
 import * as dotenv from 'dotenv';
 import * as process from 'node:process';
 
@@ -19,3 +18,4 @@ export const commonSource: DataSourceOptions = {
 } 
 
 export const AppDataSource = new DataSource(commonSource) 
+
