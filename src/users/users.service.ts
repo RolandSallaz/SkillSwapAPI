@@ -6,11 +6,13 @@ import { Repository } from 'typeorm';
 import { CreateUsersDto } from './dto/create.users.dto';
 import { UpdateUsersDto } from './dto/update.users.dto';
 import { User } from './entities/users.entity';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
+    private readonly configService: ConfigService,
   ) {}
   async create(createUserDto: CreateUsersDto) {
     const user = (await this.userRepository.save(createUserDto)) as User;
@@ -49,7 +51,10 @@ export class UsersService {
   }
 
   async updatePassword(id: string, newPassword: string) {
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const hashedPassword = await bcrypt.hash(
+      newPassword,
+      this.configService.get<number>('salt') as number,
+    );
     const user = await this.userRepository.findOneByOrFail({ id });
     const updatedUser = await this.userRepository.save({
       ...user,

@@ -1,6 +1,5 @@
 import * as dotenv from 'dotenv';
-import { logger } from './mainLogger';
-import * as process from 'node:process';
+import { logger } from 'src/logger/mainLogger';
 dotenv.config();
 
 export default () => ({
@@ -12,9 +11,14 @@ export default () => ({
     accessTokenSecret: process.env.JWT_ACCESS_SECRET || 'accessToken',
     refreshTokenSecret: process.env.JWT_REFRESH_SECRET || 'refreshToken',
   },
+  salt: Number(process.env.BCRYPT_SALT_ROUNDS) || 10,
+  upload: {
+    dir: process.env.UPLOAD_DIR || './public/uploads',
+    fileSizeMax: Number(process.env.UPLOAD_FILE_SIZE_MAX || 2 * 1024 * 1024),
+  },
 });
 
-logger.log(
+logger.info(
   `Проверка подгрузки env ${JSON.stringify(
     {
       port: process.env.PORT,
