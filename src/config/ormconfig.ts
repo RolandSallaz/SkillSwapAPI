@@ -1,9 +1,8 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
-import * as path from "path";
 import * as dotenv from 'dotenv';
 import * as process from 'node:process';
 
-dotenv.config({ path: path.resolve(__dirname, "../../.env.example") });
+dotenv.config();
 
 export const commonSource: DataSourceOptions = {
   type: 'postgres',
