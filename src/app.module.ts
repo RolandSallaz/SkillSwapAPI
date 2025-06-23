@@ -9,7 +9,9 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { AccessTokenGuard } from './auth/guards/accessToken.guard';
+import { WinstonLoggerService } from './logger/winston-logger.service';
 import { SkillsModule } from './skills/skills.module';
+import { UploadsModule } from './uploads/uploads.module';
 
 @Module({
   imports: [
@@ -37,9 +39,10 @@ import { SkillsModule } from './skills/skills.module';
     UsersModule,
     AuthModule,
     SkillsModule,
+    UploadsModule,
   ],
   controllers: [AppController],
-  providers: [AppService, AccessTokenGuard],
+  providers: [AppService, AccessTokenGuard, WinstonLoggerService],
   exports: [AccessTokenGuard],
 })
 export class AppModule {}

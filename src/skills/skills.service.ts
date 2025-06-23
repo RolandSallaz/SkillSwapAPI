@@ -1,11 +1,11 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSkillDto } from './dto/create-skill.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Skill } from './entities/skill.entity';
-import { Repository } from 'typeorm';
 import { UpdateSkillDto } from './dto/update-skill.dto';
 import { unlink } from 'node:fs';
 import * as path from 'path';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Skill } from './entities/skill.entity';
 
 @Injectable()
 export class SkillsService {
@@ -20,8 +20,37 @@ export class SkillsService {
     });
   }
 
-  findAll() {
-    return `This action returns all skills`;
+  constructor(
+    @InjectRepository(Skill)
+    private readonly skillRepository: Repository<Skill>,
+  ) {}
+
+  async find(query: { page?: string; limit?: string; search?: string }) {
+    const page = Math.max(parseInt(query.page ?? '1'), 1);
+    const limit = Math.min(Math.max(parseInt(query.limit ?? '20'), 1), 100);
+    const search = (query.search || '').trim().toLowerCase();
+    const qb = this.skillRepository.createQueryBuilder('skill');
+
+    if (search) {
+      qb.where('LOWER(skill.title) LIKE :search', { search: `%${search}%` });
+    }
+
+    const [skills, total] = await qb
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
+
+    const totalPages = Math.ceil(total / limit);
+
+    if (page > totalPages && totalPages !== 0) {
+      throw new NotFoundException('Page not found');
+    }
+
+    return {
+      data: skills,
+      page,
+      totalPages,
+    };
   }
 
   findOne(id: string) {

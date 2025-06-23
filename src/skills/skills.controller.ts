@@ -8,7 +8,9 @@ import {
   Delete,
   UseGuards,
   Req,
+  Query,
 } from '@nestjs/common';
+import { FindSkillsQueryDto } from './dto/find-skill.dto';
 import { SkillsService } from './skills.service';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
@@ -24,8 +26,8 @@ export class SkillsController {
   }
 
   @Get()
-  findAll() {
-    return this.skillsService.findAll();
+  find(@Query() query: FindSkillsQueryDto) {
+    return this.skillsService.find(query);
   }
 
   @Get(':id')
