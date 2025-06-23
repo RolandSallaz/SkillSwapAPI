@@ -1,13 +1,13 @@
 import { JwtService } from '@nestjs/jwt';
-import { RefreshTokenGuard } from './refreshToken.guard';
+import { AccessTokenGuard } from './accessToken.guard';
 import { ConfigService } from '@nestjs/config';
 
-describe('RefreshTokenGuard', () => {
+describe('AccessTokenGuard', () => {
   it('should be defined', () => {
     const mockedJwtService = {} as JwtService;
     const mockedConfigService = {} as ConfigService;
 
-    const guard = new RefreshTokenGuard(mockedJwtService, mockedConfigService);
+    const guard = new AccessTokenGuard(mockedJwtService, mockedConfigService);
     expect(guard).toBeDefined();
   });
 });

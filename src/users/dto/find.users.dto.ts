@@ -9,11 +9,12 @@ import {
   Min,
 } from 'class-validator';
 import { User } from '../entities/users.entity';
-import { Gender } from '../enums';
+import { Gender, UserRole } from '../enums';
 import { ApiProperty } from '@nestjs/swagger';
+import { Skill } from 'src/skills/entities/skill.entity';
 
 // DTO для создания пользователя при передачи данных через API
-export class CreateUsersDto extends PartialType(User) {
+export class FindUserDTO extends PartialType(User) {
   @IsUUID()
   @IsNotEmpty()
   @ApiProperty({
@@ -34,11 +35,6 @@ export class CreateUsersDto extends PartialType(User) {
   })
   email: string;
 
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty({ example: 'qwert', description: 'Пароль' })
-  password: string;
-
   @Min(10)
   @Max(100)
   @ApiProperty({ example: 30, description: 'Возраст' })
@@ -56,7 +52,20 @@ export class CreateUsersDto extends PartialType(User) {
   @ApiProperty({ example: Gender.MALE, enum: Gender, description: 'Пол' })
   gender: Gender;
 
-  @IsString()
-  @ApiProperty({ example: 'refresh_token_value', description: 'Refresh Token' })
-  refreshToken: string;
+  @ApiProperty({ example: 'Навык', enum: Gender, description: 'Навык' })
+  skills: Skill[];
+
+  @ApiProperty({
+    example: 'favoriteSkills',
+    enum: Gender,
+    description: 'favoriteSkills',
+  })
+  favoriteSkills: Skill[];
+
+  @ApiProperty({
+    example: 'Роль пользователя',
+    enum: Gender,
+    description: 'user',
+  })
+  role: UserRole;
 }

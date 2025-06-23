@@ -5,19 +5,8 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Request } from 'express';
 import { ConfigService } from '@nestjs/config';
-
-// фейковая стуктура payload JWT токена
-export interface JwtPayload {
-  sub: string;
-  email: string;
-  role: 'user' | 'admin';
-}
-
-export interface AuthRequest extends Request {
-  user: JwtPayload;
-}
+import { JwtPayload, AuthRequest } from '../types';
 
 @Injectable()
 export class AccessTokenGuard implements CanActivate {
@@ -46,7 +35,7 @@ export class AccessTokenGuard implements CanActivate {
       console.log('JWT payload:', payload);
       request.user = payload;
     } catch {
-      throw new UnauthorizedException('Требуется авторизацияdd');
+      throw new UnauthorizedException('Требуется авторизация');
     }
     return true;
   }
