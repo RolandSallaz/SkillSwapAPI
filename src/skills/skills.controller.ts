@@ -30,11 +30,6 @@ export class SkillsController {
     return this.skillsService.find(query);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.skillsService.findOne(id);
-  }
-
   @UseGuards(AccessTokenGuard)
   @Patch(':id')
   update(

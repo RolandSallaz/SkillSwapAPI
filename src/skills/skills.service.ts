@@ -48,10 +48,6 @@ export class SkillsService {
     };
   }
 
-  findOne(id: string) {
-    return `This action returns a #${id} skill`;
-  }
-
   async update(userId: string, id: string, updateSkillDto: UpdateSkillDto) {
     const skill = await this.userIsOwner(id, userId);
     return await this.skillRepository.save({
