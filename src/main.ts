@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as cookieParser from 'cookie-parser';
 import { ConfigService } from '@nestjs/config';
+import { AllExceptionFilter } from './common/all-exception.filter';
 import { WinstonLoggerService } from './logger/winston-logger.service';
 import { logger } from './logger/mainLogger';
 import { HttpLoggerMiddleware } from './logger/http-logger.middleware';
@@ -15,6 +16,7 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   app.use(cookieParser());
+  app.useGlobalFilters(new AllExceptionFilter(configService));
   app.use(new HttpLoggerMiddleware().use);
 
   app.useGlobalPipes(

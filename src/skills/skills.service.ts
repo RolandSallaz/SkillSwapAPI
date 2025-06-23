@@ -1,15 +1,24 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { CreateSkillDto } from './dto/create-skill.dto';
+import { UpdateSkillDto } from './dto/update-skill.dto';
+import { unlink } from 'node:fs';
+import * as path from 'path';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Skill } from './entities/skill.entity';
-// import { CreateSkillDto } from './dto/create-skill.dto';
-// import { UpdateSkillDto } from './dto/update-skill.dto';
 
 @Injectable()
 export class SkillsService {
-  // create(createSkillDto: CreateSkillDto) {
-  //   return 'This action adds a new skill';
-  // }
+  constructor(
+    @InjectRepository(Skill) private skillRepository: Repository<Skill>,
+  ) {}
+
+  async create(userId: string, createSkillDto: CreateSkillDto) {
+    return await this.skillRepository.save({
+      ...createSkillDto,
+      owner: { id: userId },
+    });
+  }
 
   constructor(
     @InjectRepository(Skill)
@@ -44,15 +53,38 @@ export class SkillsService {
     };
   }
 
-  findOne(id: number) {
+  findOne(id: string) {
     return `This action returns a #${id} skill`;
   }
 
-  // update(id: number, updateSkillDto: UpdateSkillDto) {
-  //   return `This action updates a #${id} skill`;
-  // }
+  async update(userId: string, id: string, updateSkillDto: UpdateSkillDto) {
+    const skill = await this.userIsOwner(id, userId);
+    return await this.skillRepository.save({
+      ...skill,
+      ...updateSkillDto,
+    });
+  }
 
-  remove(id: number) {
-    return `This action removes a #${id} skill`;
+  async remove(id: string, userId: string) {
+    const skill = await this.userIsOwner(id, userId);
+    skill.images.forEach((image) => {
+      const relativePath = image.startsWith('/') ? image.slice(1) : image;
+      const absolutePath = path.join(process.cwd(), relativePath);
+      unlink(absolutePath, (err) => {
+        if (err) {
+          console.error(`Ошибка при удалении файла ${absolutePath}:`, err);
+        }
+      });
+    });
+    await this.skillRepository.delete(id);
+    return `Skill with id ${id} has been removed`;
+  }
+
+  async userIsOwner(id: string, userId: string) {
+    const skill = await this.skillRepository.findOneByOrFail({ id });
+    if (skill.owner.id !== userId) {
+      throw new ForbiddenException('Недостаточно прав');
+    }
+    return skill;
   }
 }

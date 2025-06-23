@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.auth.dto';
 import { UsersService } from '../users/users.service';
@@ -10,26 +10,30 @@ import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class AuthService {
+  private readonly saltRounds: number;
+
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
     private readonly configService: ConfigService,
-  ) {}
+  ) {
+    this.saltRounds = this.configService.get<number>('salt') as number;
+  }
 
   async register(registerDto: RegisterDto) {
-    const existingUser = await this.usersService.findByEmail(registerDto.email);
-    if (existingUser) {
-      throw new UnauthorizedException(
-        'Пользователь с таким email уже существует',
-      );
-    }
-    const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+    const hashedPassword = await bcrypt.hash(
+      registerDto.password,
+      this.saltRounds,
+    );
     const id = uuidv4();
     const tokens = await this._getTokens({
       id,
       email: registerDto.email,
     });
-    const hashedRefreshToken = await bcrypt.hash(tokens.refreshToken, 10);
+    const hashedRefreshToken = await bcrypt.hash(
+      tokens.refreshToken,
+      this.saltRounds,
+    );
     const newUser = await this.usersService.create({
       ...registerDto,
       password: hashedPassword,
@@ -47,7 +51,7 @@ export class AuthService {
   async login(loginDto: LoginDto) {
     const user = await this.usersService.findByEmail(loginDto.email);
     if (!user) {
-      throw new UnauthorizedException('Пользователь не найден');
+      throw new NotFoundException('Пользователь не найден');
     }
     const passwordMatch = await bcrypt.compare(
       loginDto.password,
@@ -65,7 +69,10 @@ export class AuthService {
 
   async refresh(user: { id: string; email: string; role?: string }) {
     const tokens = await this._getTokens(user);
-    const hashedRefreshToken = await bcrypt.hash(tokens.refreshToken, 10);
+    const hashedRefreshToken = await bcrypt.hash(
+      tokens.refreshToken,
+      this.saltRounds,
+    );
     const updatedUser = await this.usersService.updateUser(user.id, {
       refreshToken: hashedRefreshToken,
     });
