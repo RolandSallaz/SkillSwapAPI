@@ -13,15 +13,16 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-      
     "typeorm": "ts-node -r tsconfig-paths/register -r dotenv/config ./node_modules/typeorm/cli.js",
-    
-    "migration:create": "npm run typeorm migration:run -- -d src/config/ormconfig-migration.ts",
+    "migration:create": "npm run typeorm migration:create -- -d src/config/ormconfig-migration.ts",
     "migration:generate": "npm run typeorm migration:generate -- src/migrations/migration -d src/config/ormconfig-migration.ts",
     "migration:migrate": "npm run typeorm migration:migrate -- -d src/config/ormconfig-migration.ts",
     "migration:revert": "npm run typeorm migration:revert -- -d src/config/ormconfig-migration.ts",
     "migration:run": "npm run typeorm migration:run -- -d src/config/ormconfig-migration.ts",
-    
+    "seed": "ts-node -r tsconfig-paths/register -r dotenv/config",
+    "seed:users": "npm run seed -- src/seeding/users.seed.ts",
+    "seed:categories": "npm run seed -- src/seeding/categories.seed.ts",
+    "seeding": "npm run seed:users && npm run seed:categories",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",

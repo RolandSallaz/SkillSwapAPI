@@ -1,8 +1,8 @@
 import { DataSource } from 'typeorm';
-import { commonSource } from './ormconfig';
+import { commonDataSource } from './configuration';
 
 const config = {
-  ...commonSource,
+  ...commonDataSource,
   port: parseInt(process.env.EXTERNAL_DATABASE_PORT ?? '15432'),
   synchronize: false,
 };

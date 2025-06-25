@@ -19,7 +19,7 @@ export class User {
     example: 1,
     description: 'Уникальный идентификатор пользователя',
   })
-  id: string;
+  id?: string;
 
   @Column({ length: 100 })
   @ApiProperty({ example: 'alex', description: 'Имя пользователя' })
@@ -46,7 +46,7 @@ export class User {
   //о себе
   @Column()
   @ApiProperty({ example: 'О себе', description: 'Информация о себе' })
-  aboutMe: string;
+  aboutMe?: string;
 
   @Column({
     type: 'enum',
@@ -72,7 +72,7 @@ export class User {
     enum: Gender,
     description: 'favoriteSkills',
   })
-  favoriteSkills: Skill[];
+  favoriteSkills?: Skill[];
 
   @Column({
     type: 'enum',
@@ -92,5 +92,5 @@ export class User {
     nullable: true,
     default: null,
   })
-  refreshToken: string | null;
+  refreshToken?: string | null;
 }
