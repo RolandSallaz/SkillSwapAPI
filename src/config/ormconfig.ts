@@ -7,7 +7,7 @@ dotenv.config();
 export const commonSource: DataSourceOptions = {
   type: 'postgres',
   host: process.env.DATABASE_HOST || 'localhost',
-  port: parseInt(process.env.INTERIOR_DATABASE_PORT ?? '5432'),
+  port: parseInt(process.env.EXTERNAL_DATABASE_PORT ?? '5432'),
   username: process.env.DATABASE_USER || 'postgres',
   password: process.env.DATABASE_PASSWORD || 'postgres',
   database: process.env.DATABASE_NAME || 'skillswap',
@@ -15,6 +15,6 @@ export const commonSource: DataSourceOptions = {
   logging: process.env.NODE_ENV !== 'production',
   entities: [__dirname + '/../**/*.entity{.ts,.js}'],
   migrations: [__dirname + '/../migrations/*{.ts,.js}'],
-} 
+};
 
-export const AppDataSource = new DataSource(commonSource) 
+export const AppDataSource = new DataSource(commonSource);
