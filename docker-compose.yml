@@ -11,7 +11,7 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: ./src
+      device: ./backend
 
   frontend_data:
     driver: local
@@ -25,11 +25,9 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.frontend
-    container_name: frontend 
+    container_name: frontend
     ports:
       - "8080:80"
-    environment:
-      - NODE_ENV=development
     networks:
       - skill_swap
     depends_on:
@@ -37,7 +35,7 @@ services:
 
   backend:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile.backend
     container_name: backend
     environment:
@@ -53,7 +51,7 @@ services:
       JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN}
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
-      
+
       # other
       PORT: ${PORT}
     ports:
@@ -61,7 +59,8 @@ services:
     depends_on:
       - postgres
     volumes:
-      - backend_data:/app/src
+      - backend_data:/app
+      - /app/node_modules
     networks:
       - skill_swap
 
@@ -79,10 +78,9 @@ services:
     networks:
       - skill_swap
     volumes:
-      - ./databasetest/dataSkillSwap.sql:/docker-entrypoint-initdb.d/dump.custom
-      - ./databasetest/restore.sh:/docker-entrypoint-initdb.d/restore.sh
+      - ./backend/databasetest/dataSkillSwap.sql:/docker-entrypoint-initdb.d/dump.custom
+      - ./backend/databasetest/restore.sh:/docker-entrypoint-initdb.d/restore.sh
       - postgres_data:/var/lib/postgresql/data
-      
 
 networks:
   skill_swap:
