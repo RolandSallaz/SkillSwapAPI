@@ -5,8 +5,7 @@ import { categories } from "./categories.data";
 const usersSeed = new Seed(
     Category,
     {
-        success: 'null-category',
-        error: 'error',
+        success: 'Данные о категориях загружены',
     },
     {
         clearBefore: true

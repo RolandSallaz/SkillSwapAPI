@@ -1,7 +1,11 @@
 import { Gender, UserRole } from "src/users/enums";
 import { User } from "../users/entities/users.entity";
 
-export const users: Array<User> = [ 
+const adminUser = {
+  
+}
+
+export const users: Array<User> = [
   {
     name: 'Александр',
     email: 'alex@example.com',

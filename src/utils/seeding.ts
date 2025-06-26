@@ -1,13 +1,21 @@
 import { DataSource, EntityManager, EntityTarget, ObjectLiteral, Repository } from 'typeorm';
 import AppDataSource from '../config/ormconfig-migration';
+import { ConsoleLogger } from '@nestjs/common';
 
 
-type SeedFn<T extends ObjectLiteral = ObjectLiteral> = (repository: Repository<T>, entityManager?: EntityManager) => Promise<void>;
+type SeedFn<T extends ObjectLiteral = ObjectLiteral> = (
+    repository: Repository<T>, 
+    entityManager?: EntityManager,
+) => Promise<void>;
 
 type SeedMessages = {
     success: string,
-    error: string,
+    error?: string,
 };
+
+const SeedMessagesDefault: Required<Pick<SeedMessages, 'error'>> = {
+    error: 'Ошибка сидирования',
+}
 
 type SeedSettings = {
     dataSource: DataSource,
@@ -21,11 +29,10 @@ const SeedSettingsDefault: SeedSettings = {
 
 export class Seed <TRepository extends ObjectLiteral = ObjectLiteral> {
 
-    private reposetory: EntityTarget<TRepository>
     private messages: SeedMessages
-    private fn: SeedFn<TRepository>
+    private reposetory: EntityTarget<TRepository>
     private settings: SeedSettings
-
+    private loger
     private dataSource: DataSource
 
     constructor(
@@ -33,15 +40,19 @@ export class Seed <TRepository extends ObjectLiteral = ObjectLiteral> {
         messages: SeedMessages,
         settings: Partial<SeedSettings> = {}
     ){
+        this.loger = new ConsoleLogger(Seed.name)
         this.reposetory = reposetory
-        this.messages = messages
-
+        this.messages = {
+            ...SeedMessagesDefault,
+            ...messages
+        }
         this.settings = {
             ...SeedSettingsDefault,
             ...settings,
         }
 
         this.dataSource = this.settings.dataSource
+
     }
 
     private async seeding(fn: SeedFn<TRepository>) {
@@ -52,22 +63,21 @@ export class Seed <TRepository extends ObjectLiteral = ObjectLiteral> {
 
         if(this.settings.clearBefore){
             await repository.clear()
+            this.loger.warn(`Data in ${repository.metadata.name} is cleared`)
         }else{
-
             const count = await repository.count();
             if (count !== 0) {
                 await this.dataSource.destroy();
+                this.loger.warn(`Data exist in ${repository.metadata.name}`)
                 return;
             }
         }
 
         try{
-            
             await this.dataSource.transaction( async (entityManager)=>{
                 await fn(repository, entityManager)
             })
-
-            console.log(this.messages.success);
+            this.loger.log(this.messages.success);
         }catch (e){
             erorr = e
         }finally{
@@ -81,7 +91,7 @@ export class Seed <TRepository extends ObjectLiteral = ObjectLiteral> {
 
     run(fn: SeedFn<TRepository>){
         this.seeding(fn).catch(e=>{
-            console.error(this.messages.error, e);
+            this.loger.error(this.messages.error, e);
             process.exit(1);
         })
     }

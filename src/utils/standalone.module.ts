@@ -1,0 +1,36 @@
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import AppDataSource from '../config/ormconfig-migration';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
+import { configuration } from 'src/config/configuration';
+
+@Module({
+  imports: [
+    TypeOrmModule.forRoot(AppDataSource.options),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => (AppDataSource.options),
+      inject: [ConfigService],
+    }),
+    ConfigModule.forRoot({
+        isGlobal: true,
+        load: [configuration],
+    }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      global: true,
+      useFactory: (configService: ConfigService) => ({
+        global: true,
+        secret: configService.get<string>('jwt.accessTokenSecret'),
+        signOptions: {
+          expiresIn: configService.get<string>(
+            'jwt.accessTokenSecretExpiresIn',
+          ),
+        },
+      }),
+    }),
+  ],
+})
+export class StandaloneDatabaseModule {}

@@ -37,6 +37,7 @@ logger.info(
 );
 
 export const commonDataSource: DataSourceOptions = {
+  name: 'default',
   type: 'postgres',
   host: process.env.DATABASE_HOST || 'localhost',
   port: parseInt(process.env.INTERIOR_DATABASE_PORT ?? '5432'),

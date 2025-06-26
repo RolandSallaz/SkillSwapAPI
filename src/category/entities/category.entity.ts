@@ -11,17 +11,18 @@ import {
 export class Category {
     @PrimaryGeneratedColumn('uuid')
     @ApiProperty({
-        example: 1,
+        example: '12345678-90ab-cd00-0000-f1752408d831',
         description: 'Уникальный идентификатор',
     })
     id?: string;
 
     @Column({ 
         length: 100,
+        nullable: false,
     })
     @ApiProperty({ 
-        example: 'alex', 
-        description: 'Имя пользователя',
+        example: 'Барабаны', 
+        description: 'Название категории',
     })
     name: string;
 
