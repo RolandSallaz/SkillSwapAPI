@@ -5,6 +5,8 @@ import { Module } from '@nestjs/common';
 import { AuthModule } from 'src/auth/auth.module';
 import { UsersModule } from 'src/users/users.module';
 import { StandaloneDatabaseModule } from '../utils/standalone.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 
 // const usersSeed = new Seed(
 //     User,
@@ -29,6 +31,12 @@ export class StandaloneAppModule {}
 
 async function run(){
     const app = await NestFactory.createApplicationContext(StandaloneAppModule);
+    const db = app.get(TypeOrmModule)
+    const dataSource = app.get(DataSource);
+
+    // Теперь можно использовать dataSource напрямую
+    console.log('DataSource initialized:', dataSource.isInitialized);
+
     const authService = app.get(AuthService);
     await authService.register({
         password: 'admin',

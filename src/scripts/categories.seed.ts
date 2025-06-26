@@ -1,5 +1,5 @@
 import { Category } from "../category/entities/category.entity";
-import { Seed } from '../utils/seeding';
+import { Seed } from '../utils/seedingSimple';
 import { categories } from "./categories.data";
 
 const usersSeed = new Seed(
