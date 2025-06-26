@@ -1,33 +1,32 @@
-import { Category } from "../category/entities/category.entity";
+import { Category } from '../category/entities/category.entity';
 import { SeedSimple } from '../utils/seedingSimple';
-import { categories } from "./categories.data";
+import { categories } from './categories.data';
 
 const usersSeed = new SeedSimple(
-    Category,
-    {
-        success: 'Данные о категориях загружены',
-    },
-    {
-        clearBefore: true
-    }
-)
+  Category,
+  {
+    success: 'Данные о категориях загружены',
+  },
+  {
+    clearBefore: true,
+  },
+);
 
 usersSeed.run(async (repository) => {
-    const parentsMap = new Map();
+  const parentsMap = new Map();
 
-    for (const category of categories) {
+  for (const category of categories) {
+    if (category.parent == null) {
+      const entity = await repository.save(repository.create(category));
+      parentsMap.set(entity.name, entity);
+    } else {
+      const payload: Category = {
+        ...category,
+        parent: parentsMap.get(category.parent?.name) || null,
+      };
 
-        if (category.parent == null) {
-            const entity = await repository.save(repository.create(category));
-            parentsMap.set(entity.name, entity);
-        } else {
-            const payload: Category = {
-                ...category,
-                parent: parentsMap.get(category.parent?.name),
-            }
-
-            const entity = await repository.save(repository.create(payload));
-            parentsMap.set(entity.name, entity);
-        }
+      const entity = await repository.save(repository.create(payload));
+      parentsMap.set(entity.name, entity);
     }
-})
+  }
+});

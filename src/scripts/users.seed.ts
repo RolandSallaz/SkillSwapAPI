@@ -13,19 +13,16 @@ import { RegisterDto } from '../auth/dto/register.auth.dto';
 })
 export class StandaloneAppModule {}
 
-const usersSeed = new SeedByApp(
-        User,
-        StandaloneAppModule,
-        {
-            success: 'Данные о пользователях загружены',
-        },
-)
+const usersSeed = new SeedByApp(User, StandaloneAppModule, {
+  success: 'Данные о пользователях загружены',
+});
 
-usersSeed.run(async (app, rep)=>{
-    const authService = app.get(AuthService);
-    const date = String(Date.now())
+usersSeed.run(async (app) => {
+  const authService = app.get(AuthService);
 
-    await Promise.all(users.map(user => {
-        return  authService.register(user as RegisterDto)
-    }))
-})
+  await Promise.all(
+    users.map((user) => {
+      return authService.register(user as RegisterDto);
+    }),
+  );
+});

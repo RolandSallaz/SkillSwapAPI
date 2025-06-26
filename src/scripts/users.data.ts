@@ -1,5 +1,5 @@
-import { Gender, UserRole } from "../users/enums";
-import { User } from "../users/entities/users.entity";
+import { Gender, UserRole } from '../users/enums';
+import { User } from '../users/entities/users.entity';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
@@ -14,7 +14,7 @@ const adminUser = {
   gender: Gender.MALE,
   skills: [],
   role: UserRole.ADMIN,
-}
+};
 
 export const users: Array<User> = [
   adminUser,
@@ -48,7 +48,7 @@ export const users: Array<User> = [
     city: 'Новосибирск',
     aboutMe: 'Бэкенд-энтузиаст',
     gender: Gender.MALE,
-    skills:[],
+    skills: [],
     role: UserRole.USER,
-  }
-]
+  },
+];

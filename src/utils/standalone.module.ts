@@ -9,12 +9,12 @@ import { configuration } from '../config/configuration';
   imports: [
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => (AppDataSource.options),
+      useFactory: () => AppDataSource.options,
       inject: [ConfigService],
     }),
     ConfigModule.forRoot({
-        isGlobal: true,
-        load: [configuration],
+      isGlobal: true,
+      load: [configuration],
     }),
     JwtModule.registerAsync({
       imports: [ConfigModule],

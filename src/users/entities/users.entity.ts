@@ -86,9 +86,9 @@ export class User {
   })
   role: UserRole;
 
-  @Column({ 
-    type: 'varchar', 
-    length: 255, 
+  @Column({
+    type: 'varchar',
+    length: 255,
     nullable: true,
     default: null,
   })

@@ -4,4 +4,4 @@ import { commonDataSource } from './configuration';
 
 dotenv.config();
 
-export const AppDataSource = new DataSource(commonDataSource) 
+export const AppDataSource = new DataSource(commonDataSource);

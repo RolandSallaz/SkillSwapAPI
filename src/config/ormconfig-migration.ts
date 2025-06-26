@@ -7,4 +7,4 @@ const config = {
   synchronize: true,
 };
 
-export default new DataSource(config)
+export default new DataSource(config);
