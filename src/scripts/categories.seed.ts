@@ -1,8 +1,8 @@
 import { Category } from "../category/entities/category.entity";
-import { Seed } from '../utils/seedingSimple';
+import { SeedSimple } from '../utils/seedingSimple';
 import { categories } from "./categories.data";
 
-const usersSeed = new Seed(
+const usersSeed = new SeedSimple(
     Category,
     {
         success: 'Данные о категориях загружены',
@@ -13,7 +13,6 @@ const usersSeed = new Seed(
 )
 
 usersSeed.run(async (repository) => {
-
     const parentsMap = new Map();
 
     for (const category of categories) {

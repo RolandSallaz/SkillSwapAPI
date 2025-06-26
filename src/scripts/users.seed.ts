@@ -1,55 +1,31 @@
-import { NestFactory } from '@nestjs/core';
-import { AuthService } from '../auth/auth.service';
-import { Gender } from '../users/enums';
 import { Module } from '@nestjs/common';
-import { AuthModule } from 'src/auth/auth.module';
-import { UsersModule } from 'src/users/users.module';
+import { AuthService } from '../auth/auth.service';
+import { AuthModule } from '../auth/auth.module';
+import { UsersModule } from '../users/users.module';
 import { StandaloneDatabaseModule } from '../utils/standalone.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
-
-// const usersSeed = new Seed(
-//     User,
-//     { success: 'Данные о пользователях загружены' },
-//     { clearBefore: false },
-// )
-
-// usersSeed.run(async (repository) => {
-//     for (const user of users) {
-//         await repository.save(repository.create(user))
-//     }
-
-//     console.log(await repository.find({}))
-// })
-
+import { SeedByApp } from '../utils/seedingByApp';
+import { User } from '../users/entities/users.entity';
+import { users } from './users.data';
+import { RegisterDto } from '../auth/dto/register.auth.dto';
 
 @Module({
-  imports: [UsersModule, StandaloneDatabaseModule, AuthModule],
+  imports: [StandaloneDatabaseModule, UsersModule, AuthModule],
 })
 export class StandaloneAppModule {}
 
+const usersSeed = new SeedByApp(
+        User,
+        StandaloneAppModule,
+        {
+            success: 'Данные о пользователях загружены',
+        },
+)
 
-async function run(){
-    const app = await NestFactory.createApplicationContext(StandaloneAppModule);
-    const db = app.get(TypeOrmModule)
-    const dataSource = app.get(DataSource);
-
-    // Теперь можно использовать dataSource напрямую
-    console.log('DataSource initialized:', dataSource.isInitialized);
-
+usersSeed.run(async (app, rep)=>{
     const authService = app.get(AuthService);
-    await authService.register({
-        password: 'admin',
-        name: 'admin',
-        email: 'admin@mail.com',
-        age: 100,
-        city: 'null',
-        aboutMe: 'null',
-        gender: Gender.MALE
-    });
-    await app.close();
-}
+    const date = String(Date.now())
 
-run().catch((e)=>{
-    console.log(e)
+    await Promise.all(users.map(user => {
+        return  authService.register(user as RegisterDto)
+    }))
 })

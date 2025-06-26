@@ -1,33 +1,19 @@
 import { DataSource, EntityManager, EntityTarget, ObjectLiteral, Repository } from 'typeorm';
-import AppDataSource from '../config/ormconfig-migration';
 import { ConsoleLogger } from '@nestjs/common';
+import {
+    SeedMessages,
+    SeedMessagesDefault,
+    SeedSettings,
+    SeedSettingsDefault
+} from './type'
 
 
-type SeedFn<T extends ObjectLiteral = ObjectLiteral> = (
+export type SeedFn<T extends ObjectLiteral = ObjectLiteral> = (
     repository: Repository<T>, 
     entityManager?: EntityManager,
 ) => Promise<void>;
 
-type SeedMessages = {
-    success: string,
-    error?: string,
-};
-
-const SeedMessagesDefault: Required<Pick<SeedMessages, 'error'>> = {
-    error: 'Ошибка сидирования',
-}
-
-type SeedSettings = {
-    dataSource: DataSource,
-    clearBefore: boolean,
-}
-
-const SeedSettingsDefault: SeedSettings = {
-    dataSource: AppDataSource,
-    clearBefore: false,
-}
-
-export class Seed <TRepository extends ObjectLiteral = ObjectLiteral> {
+export class SeedSimple <TRepository extends ObjectLiteral = ObjectLiteral> {
 
     private messages: SeedMessages
     private reposetory: EntityTarget<TRepository>
@@ -40,7 +26,7 @@ export class Seed <TRepository extends ObjectLiteral = ObjectLiteral> {
         messages: SeedMessages,
         settings: Partial<SeedSettings> = {}
     ){
-        this.loger = new ConsoleLogger(Seed.name)
+        this.loger = new ConsoleLogger(SeedSimple.name)
         this.reposetory = reposetory
         this.messages = {
             ...SeedMessagesDefault,
