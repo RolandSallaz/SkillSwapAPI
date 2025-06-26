@@ -33,7 +33,8 @@ export class CategoriesService {
   //   return `This action updates a #${id} category`;
   // }
 
-  remove(id: string) {
+  async remove(id: string) {
+    await this.categoryRepository.delete(id);
     return `This action removes a #${id} category`;
   }
 }

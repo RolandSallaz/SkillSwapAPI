@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { CreateRequestDto } from './dto/create-request.dto';
-import { UpdateRequestDto } from './dto/update-request.dto';
+// import { CreateRequestDto } from './dto/create-request.dto';
+// import { UpdateRequestDto } from './dto/update-request.dto';
 
 @Injectable()
 export class RequestsService {
-  create(createRequestDto: CreateRequestDto) {
-    return 'This action adds a new request';
-  }
+  // create(createRequestDto: CreateRequestDto) {
+  //   return 'This action adds a new request';
+  // }
 
   findAll() {
     return `This action returns all requests`;
@@ -16,9 +16,9 @@ export class RequestsService {
     return `This action returns a #${id} request`;
   }
 
-  update(id: number, updateRequestDto: UpdateRequestDto) {
-    return `This action updates a #${id} request`;
-  }
+  // update(id: number, updateRequestDto: UpdateRequestDto) {
+  //   return `This action updates a #${id} request`;
+  // }
 
   remove(id: number) {
     return `This action removes a #${id} request`;

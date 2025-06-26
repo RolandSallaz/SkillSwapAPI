@@ -42,6 +42,7 @@ export class CategoriesController {
   //   return this.categoriesService.update(id, updateCategoryDto);
   // }
 
+  @UseGuards(AccessTokenGuard, RoleGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.categoriesService.remove(id);
