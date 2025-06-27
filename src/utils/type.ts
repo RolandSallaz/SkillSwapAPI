@@ -1,10 +1,5 @@
-import { DataSource, EntityManager, ObjectLiteral, Repository } from 'typeorm';
+import { DataSource } from 'typeorm';
 import AppDataSource from '../config/ormconfig-migration';
-
-export type SeedFn<T extends ObjectLiteral = ObjectLiteral> = (
-  repository: Repository<T>,
-  entityManager?: EntityManager,
-) => Promise<void>;
 
 export type SeedMessages = {
   success: string;
