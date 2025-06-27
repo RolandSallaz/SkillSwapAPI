@@ -3,6 +3,7 @@ import {
   ConsoleLogger,
   INestApplicationContext,
   LoggerService,
+  Type,
 } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import {
@@ -19,23 +20,23 @@ export type SeedFn<T extends ObjectLiteral = ObjectLiteral> = (
 
 export class SeedByApp<TRepository extends ObjectLiteral = ObjectLiteral> {
   private messages: SeedMessages;
-  private reposetory: EntityTarget<TRepository>;
+  private repository: EntityTarget<TRepository>;
   private settings: SeedSettings;
-  private loger: LoggerService;
+  private logger: LoggerService;
   private dataSource: DataSource;
 
-  private module;
+  private module: Type<any>;
 
   constructor(
-    reposetory: EntityTarget<TRepository>,
-    module: any,
+    repository: EntityTarget<TRepository>,
+    module: Type<any>,
     messages: SeedMessages,
     settings: Partial<SeedSettings> = {},
   ) {
     this.module = module;
 
-    this.loger = new ConsoleLogger(SeedByApp.name);
-    this.reposetory = reposetory;
+    this.logger = new ConsoleLogger(SeedByApp.name);
+    this.repository = repository;
     this.messages = {
       ...SeedMessagesDefault,
       ...messages,
@@ -49,25 +50,25 @@ export class SeedByApp<TRepository extends ObjectLiteral = ObjectLiteral> {
   private async seeding(fn: SeedFn<TRepository>) {
     const app = await NestFactory.createApplicationContext(this.module);
     this.dataSource = app.get(DataSource);
-    let erorr = null;
+    let erorr: unknown = null;
 
-    const repository = this.dataSource.getRepository(this.reposetory);
+    const repository = this.dataSource.getRepository(this.repository);
 
     if (this.settings.clearBefore) {
       await repository.clear();
-      this.loger.warn(`Data in ${repository.metadata.name} is cleared`);
+      this.logger.warn(`Data in ${repository.metadata.name} is cleared`);
     } else {
       const count = await repository.count();
       if (count !== 0) {
         await app.close();
-        this.loger.warn(`Data exist in ${repository.metadata.name}`);
+        this.logger.warn(`Data exist in ${repository.metadata.name}`);
         return;
       }
     }
 
     try {
       await fn(app, repository);
-      this.loger.log(this.messages.success);
+      this.logger.log(this.messages.success);
     } catch (e) {
       erorr = e;
     } finally {
@@ -75,13 +76,13 @@ export class SeedByApp<TRepository extends ObjectLiteral = ObjectLiteral> {
     }
 
     if (erorr !== null) {
-      throw erorr;
+      throw erorr as Error;
     }
   }
 
   run(fn: SeedFn<TRepository>) {
     this.seeding(fn).catch((e) => {
-      this.loger.error(this.messages.error, e);
+      this.logger.error(this.messages.error, e);
       process.exit(1);
     });
   }

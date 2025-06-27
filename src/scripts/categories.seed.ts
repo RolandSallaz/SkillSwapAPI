@@ -22,7 +22,7 @@ usersSeed.run(async (repository) => {
     } else {
       const payload: Category = {
         ...category,
-        parent: parentsMap.get(category.parent?.name) || null,
+        parent: parentsMap.get(category.parent?.name) as Category,
       };
 
       const entity = await repository.save(repository.create(payload));

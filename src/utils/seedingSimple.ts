@@ -20,18 +20,18 @@ export type SeedFn<T extends ObjectLiteral = ObjectLiteral> = (
 
 export class SeedSimple<TRepository extends ObjectLiteral = ObjectLiteral> {
   private messages: SeedMessages;
-  private reposetory: EntityTarget<TRepository>;
+  private repository: EntityTarget<TRepository>;
   private settings: SeedSettings;
-  private loger: LoggerService;
+  private logger: LoggerService;
   private dataSource: DataSource;
 
   constructor(
-    reposetory: EntityTarget<TRepository>,
+    repository: EntityTarget<TRepository>,
     messages: SeedMessages,
     settings: Partial<SeedSettings> = {},
   ) {
-    this.loger = new ConsoleLogger(SeedSimple.name);
-    this.reposetory = reposetory;
+    this.logger = new ConsoleLogger(SeedSimple.name);
+    this.repository = repository;
     this.messages = {
       ...SeedMessagesDefault,
       ...messages,
@@ -45,19 +45,19 @@ export class SeedSimple<TRepository extends ObjectLiteral = ObjectLiteral> {
   }
 
   private async seeding(fn: SeedFn<TRepository>) {
-    let erorr = null;
+    let erorr: unknown = null;
 
     this.dataSource = await this.dataSource.initialize();
-    const repository = this.dataSource.getRepository(this.reposetory);
+    const repository = this.dataSource.getRepository(this.repository);
 
     if (this.settings.clearBefore) {
       await repository.clear();
-      this.loger.warn(`Data in ${repository.metadata.name} is cleared`);
+      this.logger.warn(`Data in ${repository.metadata.name} is cleared`);
     } else {
       const count = await repository.count();
       if (count !== 0) {
         await this.dataSource.destroy();
-        this.loger.warn(`Data exist in ${repository.metadata.name}`);
+        this.logger.warn(`Data exist in ${repository.metadata.name}`);
         return;
       }
     }
@@ -66,7 +66,7 @@ export class SeedSimple<TRepository extends ObjectLiteral = ObjectLiteral> {
       await this.dataSource.transaction(async (entityManager) => {
         await fn(repository, entityManager);
       });
-      this.loger.log(this.messages.success);
+      this.logger.log(this.messages.success);
     } catch (e) {
       erorr = e;
     } finally {
@@ -74,13 +74,13 @@ export class SeedSimple<TRepository extends ObjectLiteral = ObjectLiteral> {
     }
 
     if (erorr !== null) {
-      throw erorr;
+      throw erorr as Error;
     }
   }
 
   run(fn: SeedFn<TRepository>) {
     this.seeding(fn).catch((e) => {
-      this.loger.error(this.messages.error, e);
+      this.logger.error(this.messages.error, e);
       process.exit(1);
     });
   }
