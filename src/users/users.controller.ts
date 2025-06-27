@@ -38,7 +38,7 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
-  @ApiBearerAuth()
+  @ApiBearerAuth('access-token')
   @UseGuards(AccessTokenGuard)
   @Get('me')
   @ApiOperation({
@@ -54,7 +54,7 @@ export class UsersController {
     return this.usersService.findOne(req.user.sub);
   }
 
-  @ApiBearerAuth()
+  @ApiBearerAuth('access-token')
   @UseGuards(AccessTokenGuard)
   @Patch('me')
   @ApiOperation({
@@ -70,7 +70,7 @@ export class UsersController {
     return this.usersService.updateUser(req.user.sub, updateUserDto);
   }
 
-  @ApiBearerAuth()
+  @ApiBearerAuth('refresh-token')
   @UseGuards(AccessTokenGuard)
   @Patch('me/password')
   @ApiOperation({

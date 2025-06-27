@@ -8,12 +8,13 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
+import { QueryFailedError } from 'typeorm';
 import { EntityNotFoundError } from 'typeorm/error/EntityNotFoundError';
 
 @Catch()
 export class AllExceptionFilter implements ExceptionFilter {
   constructor(private readonly configService: ConfigService) {}
-  catch(exception: unknown, host: ArgumentsHost) {
+  catch(exception: QueryFailedError, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
 
@@ -30,9 +31,26 @@ export class AllExceptionFilter implements ExceptionFilter {
       'code' in exception &&
       exception.code === '23505'
     ) {
+      const driverError = exception.driverError as {
+        detail?: string;
+        table?: string;
+      };
+
+      const detail = driverError?.detail ?? '';
+      const table = driverError?.table ?? 'Entity';
+
+      const match = detail.match(/\((.+?)\)=\((.+?)\)/);
+      const field = match?.[1];
+      const value = match?.[2];
+
+      const message =
+        field && value
+          ? `${table} с таким ${field} ${value} уже существует`
+          : `${table} с таким уникальным значением уже существует`;
+
       return response.status(HttpStatus.CONFLICT).json({
         statusCode: HttpStatus.CONFLICT,
-        message: 'Пользователь с таким email уже существует',
+        message,
       });
     }
 
