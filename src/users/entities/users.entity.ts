@@ -68,9 +68,11 @@ export class User {
   @ManyToMany(() => Skill, { eager: true })
   @JoinTable()
   @ApiProperty({
-    example: 'favoriteSkills',
-    enum: Gender,
-    description: 'favoriteSkills',
+    type: () => [Skill],
+    description: 'Избранные навыки пользователя',
+    example: [
+      { id: 'uuid', title: 'Название', description: 'Описание', images: [] },
+    ],
   })
   favoriteSkills: Skill[];
 
@@ -86,9 +88,9 @@ export class User {
   })
   role: UserRole;
 
-  @Column({ 
-    type: 'varchar', 
-    length: 255, 
+  @Column({
+    type: 'varchar',
+    length: 255,
     nullable: true,
     default: null,
   })

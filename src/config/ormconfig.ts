@@ -15,6 +15,6 @@ export const commonSource: DataSourceOptions = {
   logging: process.env.NODE_ENV !== 'production',
   entities: [__dirname + '/../**/*.entity{.ts,.js}'],
   migrations: [__dirname + '/../migrations/*{.ts,.js}'],
-} 
+};
 
-export const AppDataSource = new DataSource(commonSource) 
+export const AppDataSource = new DataSource(commonSource);

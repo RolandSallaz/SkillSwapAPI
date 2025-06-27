@@ -76,7 +76,6 @@ export class AuthController {
     description:
       'Используется для получения новых токенов доступа и обновления refresh токена',
   })
-
   @ApiResponse({
     status: 200,
     description: 'Успешное обновление токенов',
