@@ -6,10 +6,14 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { AdminGuard } from '../auth/guards/admin.guard';
+import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
 
 @Controller('categories')
 export class CategoriesController {
@@ -31,11 +35,13 @@ export class CategoriesController {
   }
 
   @Patch(':id')
+  @UseGuards(AccessTokenGuard, AdminGuard)
   update(
     @Param('id') id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
+    @Req() req,
   ) {
-    return this.categoriesService.update(+id, updateCategoryDto);
+    return this.categoriesService.update(id, updateCategoryDto);
   }
 
   @Delete(':id')
