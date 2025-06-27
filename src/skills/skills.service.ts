@@ -10,7 +10,6 @@ import * as path from 'path';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Skill } from './entities/skill.entity';
-import { logger } from 'src/logger/mainLogger';
 
 @Injectable()
 export class SkillsService {
@@ -19,7 +18,6 @@ export class SkillsService {
   ) {}
 
   async create(userId: string, createSkillDto: CreateSkillDto) {
-    logger.info('вывод');
     return await this.skillRepository.save({
       ...createSkillDto,
       owner: { id: userId },

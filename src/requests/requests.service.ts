@@ -16,8 +16,23 @@ export class RequestsService {
   ) {}
 
   async create(senderID: string, createRequestDto: CreateRequestDto) {
-    const { senderId, receiverId, offeredSkillId, requestedSkillId } =
-      createRequestDto;
+    const { offeredSkillId, requestedSkillId } = createRequestDto;
+
+    const offeredSkill = await this.skillRepository.findOneBy({
+      id: offeredSkillId,
+    });
+    const requestedSkill = await this.skillRepository.findOneBy({
+      id: requestedSkillId,
+    });
+
+    if (offeredSkill == null || requestedSkill == null)
+      throw new BadRequestException(
+        `Предлагаемый / запрашиваемый навык не существует`,
+      );
+
+    const senderId = offeredSkill.owner.id;
+    const receiverId = requestedSkill.owner.id;
+
     if (senderID !== senderId)
       throw new BadRequestException(
         `Заявка сгенерирована не от имени авторизированного пользователя`,
@@ -34,18 +49,25 @@ export class RequestsService {
         `Заявка адресована  несуществующему пользователю`,
       );
 
-    const offeredSkill = await this.skillRepository.findOneBy({
-      id: offeredSkillId,
-    });
-    const requestedSkill = await this.skillRepository.findOneBy({
-      id: requestedSkillId,
-    });
+    const senderHasOfferedSkill = sender.skills.some(
+      (skill) => skill.id === offeredSkillId,
+    );
 
-    if (offeredSkill == null)
-      throw new BadRequestException(`Предлагаемый навык не существует`);
+    if (!senderHasOfferedSkill) {
+      throw new BadRequestException(
+        `Авторизированный пользователь не обладает предлагаемым навыком.`,
+      );
+    }
 
-    if (requestedSkill == null)
-      throw new BadRequestException(`Запрашиваемый навык не существует`);
+    const receiverHasRequestedSkill = receiver.skills.some(
+      (skill) => skill.id === requestedSkillId,
+    );
+
+    if (!receiverHasRequestedSkill) {
+      throw new BadRequestException(
+        `Получатель не обладает запрашиваемым навыком.`,
+      );
+    }
 
     const newRequest = new Request();
 
@@ -65,6 +87,7 @@ export class RequestsService {
     return `This action returns a #${id} request`;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   update(id: number, updateRequestDto: UpdateRequestDto) {
     return `This action updates a #${id} request`;
   }
