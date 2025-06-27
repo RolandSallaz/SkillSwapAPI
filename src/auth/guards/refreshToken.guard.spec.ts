@@ -10,8 +10,8 @@ type MockAuthRequest = {
 
 describe('RefreshTokenGuard', () => {
   let guard: RefreshTokenGuard;
-  let jwtService: JwtService;
-  let configService: ConfigService;
+  let jwtService: jest.Mocked<JwtService>;
+  let configService: jest.Mocked<ConfigService>;
 
   const mockRequest = (authorization?: string): MockAuthRequest => ({
     headers: { authorization },
@@ -21,24 +21,19 @@ describe('RefreshTokenGuard', () => {
   const mockContext = (request: MockAuthRequest): ExecutionContext => {
     return {
       switchToHttp: () => ({
-        getRequest: () => request as MockAuthRequest,
+        getRequest: () => request,
       }),
     } as ExecutionContext;
   };
 
   beforeEach(() => {
-    jwtService = {
+   jwtService = {
       verify: jest.fn(),
-    } as any;
+    } as unknown as jest.Mocked<JwtService>;
 
-    configService = {
-      get: jest.fn().mockImplementation((key: string) => {
-        if (key === 'jwt.refreshTokenSecret') {
-          return 'test_refresh_secret';
-        }
-        return undefined;
-      }),
-    } as any;
+   configService = {
+      get: jest.fn().mockReturnValue('test_refresh_secret'),
+    } as unknown as  jest.Mocked<ConfigService>;
 
     guard = new RefreshTokenGuard(jwtService, configService);
   });
@@ -54,7 +49,7 @@ describe('RefreshTokenGuard', () => {
       const context = mockContext(request);
       const payload = { userId: 1, username: 'test', refreshToken: true };
 
-      (jwtService.verify as jest.Mock).mockReturnValue(payload);
+      jwtService.verify.mockReturnValue(payload);
 
       const result = guard.canActivate(context);
 
@@ -107,7 +102,7 @@ describe('RefreshTokenGuard', () => {
       const request = mockRequest(`Bearer ${invalidToken}`);
       const context = mockContext(request);
 
-      (jwtService.verify as jest.Mock).mockImplementation(() => {
+      jwtService.verify.mockImplementation(() => {
         throw new Error('Invalid token');
       });
 

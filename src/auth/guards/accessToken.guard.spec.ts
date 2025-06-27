@@ -10,8 +10,8 @@ type MockAuthRequest = {
 
 describe('AccessTokenGuard', () => {
   let guard: AccessTokenGuard;
-  let jwtService: JwtService;
-  let configService: ConfigService;
+  let jwtService: jest.Mocked<JwtService>;
+  let configService: jest.Mocked<ConfigService>;
 
   const mockRequest = (authorization?: string): MockAuthRequest => ({
     headers: { authorization },
@@ -21,19 +21,19 @@ describe('AccessTokenGuard', () => {
   const mockContext = (request: MockAuthRequest): ExecutionContext => {
     return {
       switchToHttp: () => ({
-        getRequest: () => request as MockAuthRequest,
+        getRequest: () => request,
       }),
     } as ExecutionContext;
   };
 
   beforeEach(() => {
-    jwtService = {
+   jwtService = {
       verify: jest.fn(),
-    } as any;
+    } as unknown as jest.Mocked<JwtService>;
 
-    configService = {
+   configService = {
       get: jest.fn().mockReturnValue('test_secret'),
-    } as any;
+    } as unknown as  jest.Mocked<ConfigService>;
 
     guard = new AccessTokenGuard(jwtService, configService);
   });
@@ -49,7 +49,7 @@ describe('AccessTokenGuard', () => {
       const context = mockContext(request);
       const payload = { userId: 1, username: 'test' };
 
-      (jwtService.verify as jest.Mock).mockReturnValue(payload);
+      jwtService.verify.mockReturnValue(payload);
 
       const result = guard.canActivate(context);
 
@@ -101,7 +101,7 @@ describe('AccessTokenGuard', () => {
       const request = mockRequest(`Bearer ${invalidToken}`);
       const context = mockContext(request);
 
-      (jwtService.verify as jest.Mock).mockImplementation(() => {
+      jwtService.verify.mockImplementation(() => {
         throw new Error('Invalid token');
       });
 
