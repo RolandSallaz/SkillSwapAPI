@@ -13,7 +13,7 @@ const usersSeed = new SeedSimple(
 );
 
 usersSeed.run(async (repository) => {
-  const parentsMap = new Map();
+  const parentsMap = new Map<string, Category>();
 
   for (const category of categories) {
     if (category.parent == null) {
@@ -22,7 +22,7 @@ usersSeed.run(async (repository) => {
     } else {
       const payload: Category = {
         ...category,
-        parent: parentsMap.get(category.parent?.name) as Category,
+        parent: parentsMap.get(category.parent?.name),
       };
 
       const entity = await repository.save(repository.create(payload));
