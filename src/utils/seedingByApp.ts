@@ -82,7 +82,8 @@ export class SeedByApp<TRepository extends ObjectLiteral = ObjectLiteral> {
 
   run(fn: SeedFn<TRepository>) {
     this.seeding(fn).catch((e) => {
-      this.logger.error(this.messages.error, e);
+      this.logger.error(this.messages.error);
+      console.error(e);
       process.exit(1);
     });
   }
