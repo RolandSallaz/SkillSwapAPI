@@ -7,12 +7,12 @@ import { configuration } from '../config/configuration';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      retryAttempts: 2,
-    }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: () => AppDataSource.options,
+      useFactory: () => {
+        ...AppDataSource.options, 
+        retryAttempts: 2,
+      },
       inject: [ConfigService],
     }),
     ConfigModule.forRoot({
