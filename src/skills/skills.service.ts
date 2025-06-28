@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateSkillDto } from './dto/create-skill.dto';
 import { UpdateSkillDto } from './dto/update-skill.dto';
 import { unlink } from 'node:fs';
@@ -16,6 +20,7 @@ export class SkillsService {
   async create(userId: string, createSkillDto: CreateSkillDto) {
     return await this.skillRepository.save({
       ...createSkillDto,
+      category: { id: createSkillDto.category },
       owner: { id: userId },
     });
   }
@@ -24,7 +29,9 @@ export class SkillsService {
     const page = Math.max(parseInt(query.page ?? '1'), 1);
     const limit = Math.min(Math.max(parseInt(query.limit ?? '20'), 1), 100);
     const search = (query.search || '').trim().toLowerCase();
-    const qb = this.skillRepository.createQueryBuilder('skill');
+    const qb = this.skillRepository
+      .createQueryBuilder('skill')
+      .leftJoinAndSelect('skill.category', 'category');
 
     if (search) {
       qb.where('LOWER(skill.title) LIKE :search', { search: `%${search}%` });
@@ -50,9 +57,15 @@ export class SkillsService {
 
   async update(userId: string, id: string, updateSkillDto: UpdateSkillDto) {
     const skill = await this.userIsOwner(id, userId);
+
+    const category = updateSkillDto.category
+      ? { id: updateSkillDto.category }
+      : skill.category;
+
     return await this.skillRepository.save({
       ...skill,
       ...updateSkillDto,
+      category,
     });
   }
 
