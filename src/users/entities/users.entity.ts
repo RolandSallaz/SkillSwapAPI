@@ -68,9 +68,8 @@ export class User {
   @ManyToMany(() => Skill, { eager: true })
   @JoinTable()
   @ApiProperty({
-    example: 'favoriteSkills',
-    enum: Gender,
-    description: 'favoriteSkills',
+    type: () => [Skill],
+    description: 'Навыки, добавленные в избранное',
   })
   favoriteSkills: Skill[];
 

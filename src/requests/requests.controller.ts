@@ -3,13 +3,15 @@ import {
   Get,
   // Post,
   // Body,
-  // Patch,
+  Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { RequestsService } from './requests.service';
 // import { CreateRequestDto } from './dto/create-request.dto';
 // import { UpdateRequestDto } from './dto/update-request.dto';
+import { AccessTokenGuard } from 'src/auth/guards/accessToken.guard';
 
 @Controller('requests')
 export class RequestsController {
@@ -27,16 +29,29 @@ export class RequestsController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.requestsService.findOne(+id);
+    return this.requestsService.findOne(id);
   }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateRequestDto: UpdateRequestDto) {
-  //   return this.requestsService.update(+id, updateRequestDto);
-  // }
+  // прочитать заявку
+  @UseGuards(AccessTokenGuard)
+  @Patch(':id/read')
+  read(@Param('id') id: string) {
+    return this.requestsService.update(id, 'read');
+  }
+  // принять заявку
+  @UseGuards(AccessTokenGuard)
+  @Patch(':id/accept')
+  accept(@Param('id') id: string) {
+    return this.requestsService.update(id, 'accept');
+  }
+  // отклонить заявку
+  @UseGuards(AccessTokenGuard)
+  @Patch(':id/reject')
+  reject(@Param('id') id: string) {
+    return this.requestsService.update(id, 'reject');
+  }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.requestsService.remove(+id);
+    return this.requestsService.remove(id);
   }
 }
