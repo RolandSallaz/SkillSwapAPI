@@ -76,7 +76,6 @@ export class AuthController {
     description:
       'Используется для получения новых токенов доступа и обновления refresh токена',
   })
-
   @ApiResponse({
     status: 200,
     description: 'Успешное обновление токенов',
@@ -102,10 +101,7 @@ export class AuthController {
     status: 200,
     description: 'Успешный выход из системы',
     schema: {
-      example: {
-        message:
-          'Пользователь с id e59c23dc-b405-4eae-9bae-c8e3a2078d44 вышёл из системы',
-      },
+      example: 'Пользователь успешно вышел из системы',
     },
   })
   @HttpCode(200)
