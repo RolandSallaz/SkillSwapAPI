@@ -4,15 +4,18 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import AppDataSource from '../config/ormconfig-migration';
 import { configuration } from '../config/configuration';
+import { DataSourceOptions } from 'typeorm';
+
+const DataSource = {
+  ...AppDataSource.options,
+  retryAttempts: 2,
+}
 
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: () => {
-        ...AppDataSource.options, 
-        retryAttempts: 2,
-      },
+      useFactory: () => DataSource,
       inject: [ConfigService],
     }),
     ConfigModule.forRoot({
