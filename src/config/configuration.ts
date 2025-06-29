@@ -23,6 +23,7 @@ logger.info(
     {
       port: process.env.PORT,
       nodeEnv: process.env.NODE_ENV,
+      databaseName: process.env.DATABASE_NAME,
       jwt: {
         accessTokenSecretExpiresIn: process.env.JWT_ACCESS_EXPIRES_IN,
         refreshTokenExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
