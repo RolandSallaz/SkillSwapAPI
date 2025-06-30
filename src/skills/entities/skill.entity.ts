@@ -1,5 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from '../../users/entities/users.entity';
+import { Category } from '../../categories/entities/category.entity';
 
 @Entity()
 export class Skill {
@@ -12,8 +13,8 @@ export class Skill {
   @Column({ nullable: true, type: 'text' })
   description: string;
 
-  // @Column()
-  // category: string;
+  @ManyToOne(() => Category, { nullable: false })
+  category: Category;
 
   @Column('text', { array: true, nullable: true })
   images: string[];
