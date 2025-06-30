@@ -1,9 +1,11 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from '../../users/entities/users.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsUUID } from 'class-validator';
 
 @Entity()
 export class Skill {
+  @IsUUID()
   @PrimaryGeneratedColumn('uuid')
   @ApiProperty({
     example: '26ef3ca3-3bef-409a-85ec-a14e31f5870c',

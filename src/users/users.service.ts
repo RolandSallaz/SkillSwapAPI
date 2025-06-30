@@ -98,45 +98,48 @@ export class UsersService {
   }
 
   async addFavoriteSkill(userId: string, skillId: string) {
-    const user = await this.userRepository.findOne({
+    const user = await this.userRepository.findOneOrFail({
       where: { id: userId },
       relations: ['favoriteSkills'],
     });
-    if (!user) throw new NotFoundException('Пользователь не найден');
 
-    const skill = await this.skillRepository.findOne({
+    const skill = await this.skillRepository.findOneOrFail({
       where: { id: skillId },
     });
-    if (!skill) throw new NotFoundException('Навык не найден');
 
     if (user.favoriteSkills.some((s) => s.id === skill.id)) {
       throw new ConflictException('Навык уже в избранном');
     }
 
-    user.favoriteSkills.push(skill);
-    await this.userRepository.save(user);
+    await this.userRepository
+      .createQueryBuilder()
+      .relation(User, 'favoriteSkills')
+      .of(userId)
+      .add(skillId);
 
     return { message: 'Навык добавлен в избранное' };
   }
 
   async removeFavoriteSkill(userId: string, skillId: string) {
-    const user = await this.userRepository.findOne({
+    const user = await this.userRepository.findOneOrFail({
       where: { id: userId },
       relations: ['favoriteSkills'],
     });
-    if (!user) throw new NotFoundException('Пользователь не найден');
 
-    const skill = await this.skillRepository.findOne({
+    const skill = await this.skillRepository.findOneOrFail({
       where: { id: skillId },
     });
-    if (!skill) throw new NotFoundException('Навык не найден');
 
     if (!user.favoriteSkills.some((s) => s.id === skill.id)) {
-      throw new ConflictException('Навык уже удалён из избранного');
+      throw new NotFoundException('Навык уже удалён из избранного');
     }
 
     user.favoriteSkills = user.favoriteSkills.filter((s) => s.id !== skill.id);
-    await this.userRepository.save(user);
+    await this.userRepository
+      .createQueryBuilder()
+      .relation(User, 'favoriteSkills')
+      .of(userId)
+      .remove(skillId);
 
     return { message: 'Навык удалён из избранного' };
   }

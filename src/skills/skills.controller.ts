@@ -104,18 +104,18 @@ export class SkillsController {
 
   @ApiBearerAuth('access-token')
   @UseGuards(AccessTokenGuard)
-  @Post('skills/favorite/:id')
+  @Post('favorite/:id')
   @HttpCode(200)
   @ApiOperation({ summary: 'Добавить навык в избранное' })
-  @ApiResponse({ status: 201, description: 'Навык добавлен в избранное' })
+  @ApiResponse({ status: 200, description: 'Навык добавлен в избранное' })
   async addFavorite(@Req() req: AuthRequest, @Param('id') skillId: string) {
     return this.usersService.addFavoriteSkill(req.user.sub, skillId);
   }
 
   @ApiBearerAuth('access-token')
   @UseGuards(AccessTokenGuard)
-  @Delete('skills/favorite/:id')
-  @HttpCode(201)
+  @Delete('favorite/:id')
+  @HttpCode(200)
   @ApiOperation({ summary: 'Удалить навык из избранное' })
   @ApiResponse({ status: 200, description: 'Навык удалён из избранного' })
   async removeFavorite(@Req() req: AuthRequest, @Param('id') skillId: string) {
