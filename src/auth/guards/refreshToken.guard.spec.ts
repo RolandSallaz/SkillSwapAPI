@@ -10,8 +10,8 @@ type MockAuthRequest = {
 
 describe('RefreshTokenGuard', () => {
   let guard: RefreshTokenGuard;
-  let jwtService: jest.Mocked<JwtService>;
-  let configService: jest.Mocked<ConfigService>;
+  let jwtService: { verify: jest.Mock };
+  let configService: { get: jest.Mock };
 
   const mockRequest = (authorization?: string): MockAuthRequest => ({
     headers: { authorization },
@@ -27,15 +27,18 @@ describe('RefreshTokenGuard', () => {
   };
 
   beforeEach(() => {
-   jwtService = {
+    jwtService = {
       verify: jest.fn(),
-    } as unknown as jest.Mocked<JwtService>;
+    };
 
-   configService = {
+    configService = {
       get: jest.fn().mockReturnValue('test_refresh_secret'),
-    } as unknown as  jest.Mocked<ConfigService>;
+    };
 
-    guard = new RefreshTokenGuard(jwtService, configService);
+    guard = new RefreshTokenGuard(
+      jwtService as unknown as JwtService,
+      configService as unknown as ConfigService,
+    );
   });
 
   it('должен быть определен', () => {
