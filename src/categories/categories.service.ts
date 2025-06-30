@@ -2,6 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Repository } from 'typeorm';
 import { CreateCategoryDto } from './dto/create-category.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Category } from './entities/category.entity';
+import { Repository } from 'typeorm';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from './entities/category.entity';
 
@@ -12,8 +15,13 @@ export class CategoriesService {
     private readonly categoryRepository: Repository<Category>,
   ) {}
 
-  create(createCategoryDto: CreateCategoryDto) {
-    return 'This action adds a new category';
+  async create(createCategoryDto: CreateCategoryDto) {
+    const { parent, children } = createCategoryDto;
+    return await this.categoryRepository.save({
+      ...createCategoryDto,
+      parent: parent ? { id: parent } : undefined,
+      children: children.length > 0 ? children.map((id) => ({ id })) : [],
+    });
   }
 
   async findAll(): Promise<Category[]> {
@@ -23,15 +31,16 @@ export class CategoriesService {
     });
   }
 
-  findOne(id: number) {
+  findOne(id: string) {
     return `This action returns a #${id} category`;
   }
 
   update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    return `This action updates a #${id} category`;
+    return `This action updates a #${id} category: ${updateCategoryDto?.name}`;
   }
 
-  remove(id: number) {
+  async remove(id: string) {
+    await this.categoryRepository.delete(id);
     return `This action removes a #${id} category`;
   }
 }

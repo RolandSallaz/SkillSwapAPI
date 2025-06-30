@@ -21,7 +21,6 @@ import {
 } from '@nestjs/swagger';
 import { User } from './entities/users.entity';
 
-
 //Создание точки входа для работы с пользователями
 @Controller('users')
 export class UsersController {

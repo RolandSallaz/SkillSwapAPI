@@ -19,7 +19,7 @@ export class User {
     example: 1,
     description: 'Уникальный идентификатор пользователя',
   })
-  id: string;
+  id?: string;
 
   @Column({ length: 100 })
   @ApiProperty({ example: 'alex', description: 'Имя пользователя' })
@@ -46,7 +46,7 @@ export class User {
   //о себе
   @Column()
   @ApiProperty({ example: 'О себе', description: 'Информация о себе' })
-  aboutMe: string;
+  aboutMe?: string;
 
   @Column({
     type: 'enum',
@@ -68,11 +68,10 @@ export class User {
   @ManyToMany(() => Skill, { eager: true })
   @JoinTable()
   @ApiProperty({
-    example: 'favoriteSkills',
-    enum: Gender,
-    description: 'favoriteSkills',
+    type: () => [Skill],
+    description: 'Навыки, добавленные в избранное',
   })
-  favoriteSkills: Skill[];
+  favoriteSkills?: Skill[];
 
   @Column({
     type: 'enum',
@@ -86,11 +85,11 @@ export class User {
   })
   role: UserRole;
 
-  @Column({ 
-    type: 'varchar', 
-    length: 255, 
+  @Column({
+    type: 'varchar',
+    length: 255,
     nullable: true,
     default: null,
   })
-  refreshToken: string | null;
+  refreshToken?: string | null;
 }
