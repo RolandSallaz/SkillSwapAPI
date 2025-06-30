@@ -31,9 +31,6 @@ export class JwtWsGuard {
         secret: this.configService.get<string>('jwt.accessTokenSecret'),
       });
       client.data.user = payload;
-      logger.info('======================');
-      logger.info(payload);
-      logger.info('======================');
 
       return true;
     } catch (error) {

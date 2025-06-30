@@ -6,3 +6,9 @@ export interface SocketWithUser extends Socket {
     user: JwtPayload;
   };
 }
+
+export enum NotificationType {
+  NEW_REQUEST = 'new_request',
+  ACCEPTED_REQUEST = 'accepted_request',
+  DECLINED_REQUEST = 'declined_request',
+}

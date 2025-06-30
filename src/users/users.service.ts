@@ -10,6 +10,7 @@ import { ConfigService } from '@nestjs/config';
 
 import { logger } from 'src/logger/mainLogger';
 import { NotificationsGateway } from 'src/notifications/notifications.gateway';
+import { NotificationType } from 'src/notifications/ws-jwt/types';
 
 @Injectable()
 export class UsersService {
@@ -44,11 +45,11 @@ export class UsersService {
 
   testfindOne(id: string) {
     logger.info(`отправляем сообщение пользователю  ${id}`);
-    // this.notificationsGateway.notifyUser(id, {
-    //   type: 'message',
-    //   skillName: 'полет',
-    //   sender: '454fgf',
-    // });
+    this.notificationsGateway.notifyUser(id, {
+      type: NotificationType.NEW_REQUEST,
+      skillName: 'полет',
+      sender: '454fgf',
+    });
     //return userWithoutPassword;
   }
 

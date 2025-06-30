@@ -25,7 +25,8 @@ import { Server } from 'socket.io'; // Типизация Socket и Server из 
 import { logger } from 'src/logger/mainLogger';
 import { JwtWsGuard } from './ws-jwt/ws-jwt.guard';
 
-import { SocketWithUser } from './ws-jwt/types';
+import { NotificationType, SocketWithUser } from './ws-jwt/types';
+import { Injectable } from '@nestjs/common';
 
 @WebSocketGateway({
   cors: {
@@ -33,6 +34,7 @@ import { SocketWithUser } from './ws-jwt/types';
     credentials: true, // Разрешить передачу учетных данных (например, куки, авторизационные заголовки)
   },
 })
+@Injectable()
 export class NotificationsGateway
   implements OnGatewayConnection, OnGatewayDisconnect
 {
@@ -55,13 +57,8 @@ export class NotificationsGateway
 
       await client.join(userId);
       logger.info(
-        `[WS] Клиент ${client.id} подключен и присоединен к комнате: ${userId}`,
+        `[WS] Клиент ${client.id}(id socket) подключен и присоединен к комнате: ${userId}(id пользователя)`,
       );
-
-      // client.emit('connected', {
-      //   message: 'Удачное подключение',
-      //   userId,
-      // });
     } catch (error) {
       if (error instanceof WsException) {
         logger.warn(
@@ -84,13 +81,13 @@ export class NotificationsGateway
   handleDisconnect(client: SocketWithUser) {
     const userId = client.data.user.sub;
     logger.info(
-      `[WS] Клиент ${client.id} отключился. Идентификатор пользователя: ${userId || 'N/A'}`,
+      `[WS] Клиент ${client.id}(id socket) отключился. Идентификатор пользователя: ${userId || 'N/A'}`,
     );
   }
 
   notifyUser(
-    userId: string,
-    payload: { type: string; skillName: string; sender: string },
+    userId: string, // кому посылаем сообщение
+    payload: { type: NotificationType; skillName: string; sender: string }, //sender - от кого сообщение
   ) {
     logger.info(
       `[WS] Попытка отправить уведомление пользователю ${userId} с полезной нагрузкой: ${JSON.stringify(payload)}`,
