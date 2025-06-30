@@ -62,7 +62,7 @@ export class AuthService {
     }
     return await this.refresh({
       message: 'Авторизация прошла успешно',
-      id: user.id,
+      id: user.id as string,
       email: user.email,
       role: user.role,
     });

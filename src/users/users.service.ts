@@ -7,6 +7,7 @@ import { CreateUsersDto } from './dto/create.users.dto';
 import { UpdateUsersDto } from './dto/update.users.dto';
 import { User } from './entities/users.entity';
 import { ConfigService } from '@nestjs/config';
+import { FindUserDTO } from './dto/find.users.dto';
 
 @Injectable()
 export class UsersService {
@@ -21,12 +22,12 @@ export class UsersService {
     return userWithoutPassword;
   }
 
-  async findAll() {
+  async findAll(): Promise<FindUserDTO[]> {
     const users = await this.userRepository.find();
     const usersWithoutPassword = users.map((user) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password, refreshToken, ...userWithoutPassword } = user;
-      return userWithoutPassword;
+      return userWithoutPassword as FindUserDTO;
     });
     return usersWithoutPassword;
   }
