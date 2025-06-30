@@ -17,6 +17,16 @@ export class RequestsController {
     return this.requestsService.findAll();
   }
 
+  @Get('incoming')
+  findIncoming() {
+    return this.requestsService.findIncoming();
+  }
+
+  @Get('outgoing')
+  findOutgoing() {
+    return this.requestsService.findOutgoing();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.requestsService.findOne(+id);
