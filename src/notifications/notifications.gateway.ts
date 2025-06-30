@@ -19,136 +19,87 @@ import {
   OnGatewayDisconnect, // Интерфейс для обработки отключения
   WsException, // Для обработки ошибок WebSocket
 } from '@nestjs/websockets';
-import { UseGuards, Logger } from '@nestjs/common'; // UseGuards для применения гарда, Logger для логирования
-import { Socket, Server } from 'socket.io'; // Типизация Socket и Server из socket.io
-import { WsJwtGuard } from './ws-jwt/ws-jwt.guard';
-import { logger } from 'src/logger/mainLogger';
 
-@UseGuards(WsJwtGuard)
-// Настраиваем шлюз.
-// В production 'origin' нужно ограничить до вашего домена.
+import { Server } from 'socket.io'; // Типизация Socket и Server из socket.io
+
+import { logger } from 'src/logger/mainLogger';
+import { JwtWsGuard } from './ws-jwt/ws-jwt.guard';
+
+import { SocketWithUser } from './ws-jwt/types';
+
 @WebSocketGateway({
   cors: {
     origin: '*', // Разрешить запросы от любых источников (для разработки).
     credentials: true, // Разрешить передачу учетных данных (например, куки, авторизационные заголовки)
   },
-  // Можно также указать путь, если он отличается от корневого
-  // path: '/notifications',
 })
-// Применяем наш Guard на уровне Gateway. Все входящие соединения будут проходить через него.
-
 export class NotificationsGateway
   implements OnGatewayConnection, OnGatewayDisconnect
 {
-  // Декоратор @WebSocketServer() инжектирует экземпляр сервера Socket.IO.
-  // Это позволяет вам отправлять сообщения в комнаты или конкретным клиентам.
+  constructor(private readonly jwtGuard: JwtWsGuard) {}
   @WebSocketServer() server: Server;
-  private readonly logger = new Logger(NotificationsGateway.name);
 
-  /**
-   * Метод вызывается, когда новый клиент успешно устанавливает WebSocket-соединение
-   * и проходит через WsJwtGuard.
-   *
-   * @param client Объект Socket.IO, представляющий подключившегося клиента.
-   */
-  handleConnection(client: Socket, ...args: any[]) {
+  async handleConnection(client: SocketWithUser) {
     try {
-      // WsJwtGuard, который мы применили, уже проверил токен
-      // и прикрепил пейлоуд пользователя к объекту client['user'].
-      // Извлекаем ID пользователя из пейлоуда (предполагаем, что он в 'sub').
-      logger.info("вывод");
-      const userId = client['user']?.sub;
+      this.jwtGuard.verifyToken(client);
+      const userId = client.data.user?.sub;
 
-      // Эта проверка технически избыточна, так как Guard уже должен был отсеять
-      // неавторизованных. Однако, это может быть полезно для отладки или если
-      // `sub` по какой-то причине отсутствует в валидном токене.
       if (!userId) {
-        this.logger.warn(
-          `[Gateway] User ID not found in token payload for client: ${client.id}. Disconnecting.`,
+        logger.warn(
+          `[WS] Идентификатор пользователя не найден в полезной нагрузке токена.`,
         );
-        client.disconnect(true); // Отключаем, если ID пользователя не найден.
-        return;
+        throw new WsException(
+          '[WS] Не удалось получить идентификатор пользователя из токена.',
+        );
       }
 
-      // Присоединяем клиента к комнате, названной по его ID.
-      // Это позволяет нам легко отправлять уведомления конкретному пользователю,
-      // просто отправляя их в эту комнату.
-      client.join(userId);
-      this.logger.log(
-        `[Gateway] Client ${client.id} connected and joined room: ${userId}`,
+      await client.join(userId);
+      logger.info(
+        `[WS] Клиент ${client.id} подключен и присоединен к комнате: ${userId}`,
       );
 
-      // Опционально: можно отправить клиенту подтверждение подключения
-      // client.emit('connected', { message: 'Successfully connected to notifications service', userId });
+      // client.emit('connected', {
+      //   message: 'Удачное подключение',
+      //   userId,
+      // });
     } catch (error) {
-      // Этот блок catch будет ловить ошибки, которые не были обработаны Guard'ом,
-      // или если произошла ошибка во время логики handleConnection (например, с базой данных).
       if (error instanceof WsException) {
-        // Ошибки, выброшенные WsException, уже имеют понятное сообщение.
-        this.logger.warn(
-          `[Gateway] Connection failed for client ${client.id}: ${error.message}`,
+        logger.warn(
+          `[WS] Сбой подключения для клиента ${client.id}: ${error.message}`,
         );
-      } else {
-        // Ловим любые другие непредвиденные ошибки.
-        this.logger.error(
-          `[Gateway] Unhandled error during connection for client ${client.id}: ${error.message}`,
+      } else if (error instanceof Error) {
+        logger.error(
+          `[WS] Необработанная ошибка во время подключения для клиента ${client.id}: ${error.message}`,
           error.stack,
         );
+      } else {
+        logger.error(
+          `[WS] Неизвестная ошибка во время подключения для клиента ${client.id}: ${JSON.stringify(error)}`,
+        );
       }
-      // В любом случае, при ошибке отключаем клиента.
       client.disconnect(true);
     }
   }
 
-  /**
-   * Метод вызывается, когда клиент отключается от WebSocket-сервера.
-   *
-   * @param client Объект Socket.IO, представляющий отключившегося клиента.
-   */
-  handleDisconnect(client: Socket) {
-    // Пейлоуд пользователя всё ещё может быть доступен на объекте client['user']
-    const userId = client['user']?.sub;
-    this.logger.log(
-      `[Gateway] Client ${client.id} disconnected. User ID: ${userId || 'N/A'}`,
+  handleDisconnect(client: SocketWithUser) {
+    const userId = client.data.user.sub;
+    logger.info(
+      `[WS] Клиент ${client.id} отключился. Идентификатор пользователя: ${userId || 'N/A'}`,
     );
-    // Socket.IO автоматически удаляет клиента из всех комнат при отключении,
-    // так что явный вызов `client.leave(userId)` здесь обычно не нужен.
   }
 
-  /**
-   * Метод для отправки уведомлений конкретному пользователю.
-   * Этот метод будет вызываться из других сервисов вашего приложения (например, из RequestsService).
-   *
-   * @param userId ID пользователя, которому нужно отправить уведомление.
-   * @param payload Объект, содержащий данные уведомления:
-   * - type: string (тип уведомления, например, 'new_request', 'request_accepted')
-   * - skillName: string (название навыка, к которому относится уведомление)
-   * - sender: string (пользователь, от которого поступило уведомление)
-   */
   notifyUser(
     userId: string,
     payload: { type: string; skillName: string; sender: string },
   ) {
-    this.logger.log(
-      `[Gateway] Attempting to send notification to user ${userId} with payload: ${JSON.stringify(payload)}`,
+    logger.info(
+      `[WS] Попытка отправить уведомление пользователю ${userId} с полезной нагрузкой: ${JSON.stringify(payload)}`,
     );
 
-    // Используем `this.server.to(userId).emit(...)` для отправки сообщения
-    // всем клиентам, находящимся в комнате с ID пользователя.
-    // Если пользователь не подключен или не присоединился к комнате,
-    // Socket.IO просто не найдет клиентов в этой комнате и ничего не отправит.
     this.server.to(userId).emit('notificateNewRequest', payload);
 
-    this.logger.log(
-      `[Gateway] Notification 'notificateNewRequest' sent to room ${userId}. Payload: ${JSON.stringify(payload)}`,
+    logger.info(
+      `[WS] Уведомление 'notificateNewRequest' отправлено в комнату ${userId}. Полезная нагрузка: ${JSON.stringify(payload)}`,
     );
   }
-
-  // Если вам нужен тестовый обработчик сообщения, вы можете добавить его обратно
-  // @SubscribeMessage('message')
-  // handleMessage(client: Socket, payload: any): string {
-  //   this.logger.log(`[Gateway] Message received from client ${client.id}: ${JSON.stringify(payload)}`);
-  //   client.emit('messageAck', 'Message received!'); // Отправить подтверждение клиенту
-  //   return 'Hello from server!'; // Может быть отправлено как ответ на запрос
-  // }
 }

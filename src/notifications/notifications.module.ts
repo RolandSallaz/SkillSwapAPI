@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { NotificationsGateway } from './notifications.gateway';
-import { WsJwtGuard } from './ws-jwt/ws-jwt.guard';
+import { JwtWsGuard } from './ws-jwt/ws-jwt.guard';
 
 @Module({
-  providers: [NotificationsGateway, WsJwtGuard],
+  providers: [NotificationsGateway, JwtWsGuard],
 })
 export class NotificationsModule {}

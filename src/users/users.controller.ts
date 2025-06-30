@@ -21,7 +21,6 @@ import {
 } from '@nestjs/swagger';
 import { User } from './entities/users.entity';
 
-
 //Создание точки входа для работы с пользователями
 @Controller('users')
 export class UsersController {
@@ -53,6 +52,12 @@ export class UsersController {
   })
   findCurrentUser(@Req() req: AuthRequest) {
     return this.usersService.findOne(req.user.sub);
+  }
+
+  @UseGuards(AccessTokenGuard)
+  @Get('test')
+  testUser(@Req() req: AuthRequest) {
+    return this.usersService.testfindOne(req.user.sub);
   }
 
   @ApiBearerAuth()

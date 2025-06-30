@@ -8,11 +8,15 @@ import { UpdateUsersDto } from './dto/update.users.dto';
 import { User } from './entities/users.entity';
 import { ConfigService } from '@nestjs/config';
 
+import { logger } from 'src/logger/mainLogger';
+import { NotificationsGateway } from 'src/notifications/notifications.gateway';
+
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
     private readonly configService: ConfigService,
+    private notificationsGateway: NotificationsGateway,
   ) {}
   async create(createUserDto: CreateUsersDto) {
     const user = (await this.userRepository.save(createUserDto)) as User;
@@ -36,6 +40,16 @@ export class UsersService {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, refreshToken, ...userWithoutPassword } = user;
     return userWithoutPassword;
+  }
+
+  testfindOne(id: string) {
+    logger.info(`отправляем сообщение пользователю  ${id}`);
+    // this.notificationsGateway.notifyUser(id, {
+    //   type: 'message',
+    //   skillName: 'полет',
+    //   sender: '454fgf',
+    // });
+    //return userWithoutPassword;
   }
 
   async updateUser(id: string, updateUserDto: UpdateUsersDto) {

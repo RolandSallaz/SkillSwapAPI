@@ -18,19 +18,19 @@ export default () => ({
   },
 });
 
-logger.info(
-  `Проверка подгрузки env ${JSON.stringify(
-    {
-      port: process.env.PORT,
-      nodeEnv: process.env.NODE_ENV,
-      jwt: {
-        accessTokenSecretExpiresIn: process.env.JWT_ACCESS_EXPIRES_IN,
-        refreshTokenExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
-        accessTokenSecret: process.env.JWT_ACCESS_SECRET,
-        refreshTokenSecret: process.env.JWT_REFRESH_SECRET,
-      },
-    },
-    null,
-    2,
-  )}`,
-);
+// logger.info(
+//   `Проверка подгрузки env ${JSON.stringify(
+//     {
+//       port: process.env.PORT,
+//       nodeEnv: process.env.NODE_ENV,
+//       jwt: {
+//         accessTokenSecretExpiresIn: process.env.JWT_ACCESS_EXPIRES_IN,
+//         refreshTokenExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN,
+//         accessTokenSecret: process.env.JWT_ACCESS_SECRET,
+//         refreshTokenSecret: process.env.JWT_REFRESH_SECRET,
+//       },
+//     },
+//     null,
+//     2,
+//   )}`,
+// );
