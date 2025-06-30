@@ -10,8 +10,8 @@ type MockAuthRequest = {
 
 describe('AccessTokenGuard', () => {
   let guard: AccessTokenGuard;
-  let jwtService: jest.Mocked<JwtService>;
-  let configService: jest.Mocked<ConfigService>;
+  let jwtService: { verify: jest.Mock };
+  let configService: { get: jest.Mock };
 
   const mockRequest = (authorization?: string): MockAuthRequest => ({
     headers: { authorization },
@@ -27,15 +27,18 @@ describe('AccessTokenGuard', () => {
   };
 
   beforeEach(() => {
-   jwtService = {
+    jwtService = {
       verify: jest.fn(),
-    } as unknown as jest.Mocked<JwtService>;
+    };
 
-   configService = {
+    configService = {
       get: jest.fn().mockReturnValue('test_secret'),
-    } as unknown as  jest.Mocked<ConfigService>;
+    };
 
-    guard = new AccessTokenGuard(jwtService, configService);
+    guard = new AccessTokenGuard(
+      jwtService as unknown as JwtService,
+      configService as unknown as ConfigService,
+    );
   });
 
   it('должен быть определен', () => {
