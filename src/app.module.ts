@@ -12,6 +12,8 @@ import { AccessTokenGuard } from './auth/guards/accessToken.guard';
 import { WinstonLoggerService } from './logger/winston-logger.service';
 import { SkillsModule } from './skills/skills.module';
 import { UploadsModule } from './uploads/uploads.module';
+import { RequestsModule } from './requests/requests.module';
+import { CategoriesModule } from './categories/categories.module';
 
 @Module({
   imports: [
@@ -40,6 +42,8 @@ import { UploadsModule } from './uploads/uploads.module';
     AuthModule,
     SkillsModule,
     UploadsModule,
+    RequestsModule,
+    CategoriesModule,
   ],
   controllers: [AppController],
   providers: [AppService, AccessTokenGuard, WinstonLoggerService],

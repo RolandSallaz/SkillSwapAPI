@@ -18,4 +18,3 @@ export const commonSource: DataSourceOptions = {
 } 
 
 export const AppDataSource = new DataSource(commonSource) 
-

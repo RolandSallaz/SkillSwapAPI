@@ -19,6 +19,8 @@ import {
   ApiParam,
   ApiResponse,
 } from '@nestjs/swagger';
+import { User } from './entities/users.entity';
+
 
 //Создание точки входа для работы с пользователями
 @Controller('users')
@@ -30,7 +32,7 @@ export class UsersController {
   @ApiResponse({
     status: 200,
     description: 'Список пользователей',
-    type: FindUserDTO,
+    type: User,
     isArray: true,
   })
   findAll(): Promise<FindUserDTO[]> {
@@ -47,7 +49,7 @@ export class UsersController {
   @ApiResponse({
     status: 200,
     description: 'Данные текущего пользователя',
-    type: FindUserDTO,
+    type: User,
   })
   findCurrentUser(@Req() req: AuthRequest) {
     return this.usersService.findOne(req.user.sub);
@@ -63,7 +65,7 @@ export class UsersController {
   @ApiResponse({
     status: 200,
     description: 'Данные текущего пользователя',
-    type: UpdateUsersDto,
+    type: User,
   })
   updateUser(@Req() req: AuthRequest, @Body() updateUserDto: UpdateUsersDto) {
     return this.usersService.updateUser(req.user.sub, updateUserDto);
@@ -97,7 +99,7 @@ export class UsersController {
   @ApiResponse({
     status: 200,
     description: 'Данные пользователя',
-    type: FindUserDTO,
+    type: User,
   })
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(id);
@@ -116,7 +118,12 @@ export class UsersController {
   @ApiResponse({
     status: 200,
     description: 'Данные пользователя',
-    type: FindUserDTO,
+    schema: {
+      example: {
+        message:
+          'Пользователь с id e59c23dc-b405-4eae-9bae-c8e3a2078d44 удалён',
+      },
+    },
   })
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);
