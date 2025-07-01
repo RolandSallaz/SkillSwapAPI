@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsNotEmpty, IsString } from 'class-validator';
+import { IsArray, IsNotEmpty, IsString, IsUUID } from 'class-validator';
 
 export class CreateSkillDto {
   @IsString()
@@ -12,9 +12,9 @@ export class CreateSkillDto {
   @ApiProperty({ example: 'Умею читать книги', description: 'Описание навыка' })
   description: string;
 
-  // @IsUUID()
-  // @IsNotEmpty()
-  // category: string;
+  @IsUUID()
+  @IsNotEmpty()
+  category: string;
 
   @IsArray()
   @IsString({ each: true })
