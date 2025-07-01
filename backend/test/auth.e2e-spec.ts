@@ -75,10 +75,7 @@ describe('AuthController (e2e)', () => {
   });
 
   it('/auth/register (POST) — повторная регистрация (409)', async () => {
-    await request(server)
-      .post('/auth/register')
-      .send(registerDto)
-      .expect(409);
+    await request(server).post('/auth/register').send(registerDto).expect(409);
   });
 
   it('/auth/login (POST) — неверный пароль (401)', async () => {
@@ -117,9 +114,7 @@ describe('AuthController (e2e)', () => {
   });
 
   it('/auth/refresh (POST) — нет токена (401)', async () => {
-    await request(server)
-      .post('/auth/refresh')
-      .expect(401);
+    await request(server).post('/auth/refresh').expect(401);
   });
 
   it('/auth/refresh (POST) — не Bearer токен (401)', async () => {
@@ -148,9 +143,7 @@ describe('AuthController (e2e)', () => {
   });
 
   it('/auth/logout (POST) — без accessToken (401)', async () => {
-    await request(server)
-      .post('/auth/logout')
-      .expect(401);
+    await request(server).post('/auth/logout').expect(401);
   });
 
   it('/auth/logout (POST) — невалидный accessToken (401)', async () => {
