@@ -5,3 +5,9 @@ export enum RequestStatus {
   IN_PROGRESS = 'inProgress', // В процессе выполнения
   DONE = 'done', // Завершено
 }
+
+export enum RequestAction {
+  READ = 'read',
+  ACCEPT = 'accept',
+  REJECT = 'reject',
+}

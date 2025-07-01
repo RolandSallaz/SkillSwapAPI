@@ -4,6 +4,7 @@ import {
   Column,
   ManyToOne,
   CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
 import { ApiProperty } from '@nestjs/swagger';
@@ -26,6 +27,13 @@ export class Request {
     description: 'Время создания заявки',
   })
   createdAt: Date;
+
+  @UpdateDateColumn()
+  @ApiProperty({
+    example: '2024-07-24T12:00:00.000Z',
+    description: 'Время обновления заявки',
+  })
+  updatedAt: Date;
 
   // Связь с User (отправитель)
 
