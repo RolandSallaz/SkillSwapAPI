@@ -1,5 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from '../../users/entities/users.entity';
+import { Category } from '../../categories/entities/category.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsUUID } from 'class-validator';
 
@@ -21,8 +22,8 @@ export class Skill {
   @ApiProperty({ example: 'Умею читать книги', description: 'Описание навыка' })
   description: string;
 
-  // @Column()
-  // category: string;
+  @ManyToOne(() => Category, { nullable: false })
+  category: Category;
 
   @Column('text', { array: true, nullable: true })
   @ApiProperty({

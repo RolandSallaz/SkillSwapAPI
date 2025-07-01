@@ -101,9 +101,7 @@ export class AuthController {
     status: 200,
     description: 'Успешный выход из системы',
     schema: {
-      example: {
-        message: 'Пользователь успешно вышел из системы',
-      },
+      example: 'Пользователь успешно вышел из системы',
     },
   })
   @HttpCode(200)
