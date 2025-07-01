@@ -8,6 +8,7 @@ import { logger } from './logger/mainLogger';
 import { HttpLoggerMiddleware } from './logger/http-logger.middleware';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { IoAdapter } from '@nestjs/platform-socket.io';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -26,7 +27,7 @@ async function bootstrap() {
       transform: true,
     }),
   );
-
+  app.useWebSocketAdapter(new IoAdapter(app));
   const config = new DocumentBuilder()
     .setTitle('SkillSwap API')
     .setDescription('API')
