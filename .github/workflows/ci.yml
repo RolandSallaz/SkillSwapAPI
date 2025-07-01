@@ -20,10 +20,14 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          cd backend
+          npm ci
 
       - name: Run linter
-        run: npm run lint
+        run: |
+          cd backend
+          npm run lint
 
   unit-tests:
     name: Run Unit Tests (only on main)
@@ -39,10 +43,14 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          cd backend
+          npm ci
 
       - name: Run unit tests
-        run: npm run test
+        run: |
+          cd backend
+          npm run test
 
   e2e-tests:
     name: Run E2E Tests (only on main)
@@ -78,7 +86,11 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+          cd backend
+          npm ci
 
       - name: Run e2e tests
-        run: npm run test:e2e
+        run: |
+          cd backend
+          npm run test:e2e
