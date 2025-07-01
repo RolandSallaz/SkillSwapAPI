@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
@@ -7,11 +11,14 @@ import { CreateUsersDto } from './dto/create.users.dto';
 import { UpdateUsersDto } from './dto/update.users.dto';
 import { User } from './entities/users.entity';
 import { ConfigService } from '@nestjs/config';
+import { Skill } from 'src/skills/entities/skill.entity';
+import { FindUserDTO } from './dto/find.users.dto';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(Skill) private skillRepository: Repository<Skill>,
     private readonly configService: ConfigService,
   ) {}
   async create(createUserDto: CreateUsersDto) {
@@ -22,24 +29,32 @@ export class UsersService {
   }
 
   async findAll() {
-    const users = await this.userRepository.find();
+    const users = await this.userRepository.find({
+      relations: ['skills'],
+    });
     const usersWithoutPassword = users.map((user) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password, refreshToken, ...userWithoutPassword } = user;
-      return userWithoutPassword;
+      return userWithoutPassword as FindUserDTO;
     });
     return usersWithoutPassword;
   }
 
   async findOne(id: string) {
-    const user = await this.userRepository.findOneByOrFail({ id });
+    const user = await this.userRepository.findOneOrFail({
+      where: { id },
+      relations: ['skills'],
+    });
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, refreshToken, ...userWithoutPassword } = user;
     return userWithoutPassword;
   }
 
   async updateUser(id: string, updateUserDto: UpdateUsersDto) {
-    const user = await this.userRepository.findOneByOrFail({ id });
+    const user = await this.userRepository.findOneOrFail({
+      where: { id },
+      relations: ['skills'],
+    });
     const updatedUser = await this.userRepository.save({
       ...user,
       ...updateUserDto,
@@ -81,5 +96,52 @@ export class UsersService {
     user.refreshToken = '';
     await this.userRepository.save(user);
     return { message: `Refresh token для пользователя с id ${id} удален` };
+  }
+
+  async addFavoriteSkill(userId: string, skillId: string) {
+    const user = await this.userRepository.findOneOrFail({
+      where: { id: userId },
+      relations: ['favoriteSkills'],
+    });
+
+    const skill = await this.skillRepository.findOneOrFail({
+      where: { id: skillId },
+    });
+
+    if (user.favoriteSkills.some((s) => s.id === skill.id)) {
+      throw new ConflictException('Навык уже в избранном');
+    }
+
+    await this.userRepository
+      .createQueryBuilder()
+      .relation(User, 'favoriteSkills')
+      .of(userId)
+      .add(skillId);
+
+    return { message: 'Навык добавлен в избранное' };
+  }
+
+  async removeFavoriteSkill(userId: string, skillId: string) {
+    const user = await this.userRepository.findOneOrFail({
+      where: { id: userId },
+      relations: ['favoriteSkills'],
+    });
+
+    const skill = await this.skillRepository.findOneOrFail({
+      where: { id: skillId },
+    });
+
+    if (!user.favoriteSkills.some((s) => s.id === skill.id)) {
+      throw new NotFoundException('Навык уже удалён из избранного');
+    }
+
+    user.favoriteSkills = user.favoriteSkills.filter((s) => s.id !== skill.id);
+    await this.userRepository
+      .createQueryBuilder()
+      .relation(User, 'favoriteSkills')
+      .of(userId)
+      .remove(skillId);
+
+    return { message: 'Навык удалён из избранного' };
   }
 }
