@@ -11,7 +11,7 @@ import { Skill } from 'src/skills/entities/skill.entity';
   imports: [
     TypeOrmModule.forFeature([User]),
     TypeOrmModule.forFeature([Skill]),
-     NotificationsModule
+    NotificationsModule,
   ],
   controllers: [UsersController],
   providers: [UsersService, AccessTokenGuard],
