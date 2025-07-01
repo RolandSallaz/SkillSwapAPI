@@ -25,6 +25,7 @@ import {
   ApiResponse,
 } from '@nestjs/swagger';
 import { Skill } from './entities/skill.entity';
+
 @Controller('skills')
 export class SkillsController {
   constructor(

@@ -12,6 +12,7 @@ import { UpdateUsersDto } from './dto/update.users.dto';
 import { User } from './entities/users.entity';
 import { ConfigService } from '@nestjs/config';
 import { Skill } from 'src/skills/entities/skill.entity';
+import { FindUserDTO } from './dto/find.users.dto';
 
 @Injectable()
 export class UsersService {
@@ -34,7 +35,7 @@ export class UsersService {
     const usersWithoutPassword = users.map((user) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password, refreshToken, ...userWithoutPassword } = user;
-      return userWithoutPassword;
+      return userWithoutPassword as FindUserDTO;
     });
     return usersWithoutPassword;
   }

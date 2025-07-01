@@ -79,8 +79,6 @@ services:
     networks:
       - skill_swap
     volumes:
-      - ./databasetest/dataSkillSwap.sql:/docker-entrypoint-initdb.d/dump.custom
-      - ./databasetest/restore.sh:/docker-entrypoint-initdb.d/restore.sh
       - postgres_data:/var/lib/postgresql/data
       
 
