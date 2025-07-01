@@ -40,6 +40,27 @@ export class RequestsController {
     return this.requestsService.update(+id, updateRequestDto);
   }
 
+  // прочитать заявку
+  @UseGuards(AccessTokenGuard)
+  @Patch(':id/read')
+  read(@Param('id') id: string) {
+    return this.requestsService.update(id, 'read');
+  }
+
+  // принять заявку
+  @UseGuards(AccessTokenGuard)
+  @Patch(':id/accept')
+  accept(@Param('id') id: string) {
+    return this.requestsService.update(id, 'accept');
+  }
+
+  // отклонить заявку
+  @UseGuards(AccessTokenGuard)
+  @Patch(':id/reject')
+  reject(@Param('id') id: string) {
+    return this.requestsService.update(id, 'reject');
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.requestsService.remove(+id);
