@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Repository } from 'typeorm';
@@ -36,7 +35,6 @@ export class CategoriesService {
     return `This action returns a #${id} category`;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   update(id: number, updateCategoryDto: UpdateCategoryDto) {
     return `This action updates a #${id} category: ${updateCategoryDto?.name}`;
   }
