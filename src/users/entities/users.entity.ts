@@ -69,7 +69,10 @@ export class User {
   @JoinTable()
   @ApiProperty({
     type: () => [Skill],
-    description: 'Навыки, добавленные в избранное',
+    description: 'Избранные навыки пользователя',
+    example: [
+      { id: 'uuid', title: 'Название', description: 'Описание', images: [] },
+    ],
   })
   favoriteSkills?: Skill[];
 

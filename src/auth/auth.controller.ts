@@ -102,8 +102,7 @@ export class AuthController {
     description: 'Успешный выход из системы',
     schema: {
       example: {
-        message:
-          'Пользователь с id e59c23dc-b405-4eae-9bae-c8e3a2078d44 вышёл из системы',
+        message: 'Пользователь успешно вышел из системы',
       },
     },
   })
