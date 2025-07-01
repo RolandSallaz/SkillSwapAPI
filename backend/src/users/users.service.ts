@@ -123,7 +123,7 @@ export class UsersService {
       where: { id: skillId },
     });
 
-    if (user.favoriteSkills.some((s) => s.id === skill.id)) {
+    if (user.favoriteSkills?.some((s) => s.id === skill.id)) {
       throw new ConflictException('Навык уже в избранном');
     }
 
@@ -146,7 +146,7 @@ export class UsersService {
       where: { id: skillId },
     });
 
-    if (!user.favoriteSkills.some((s) => s.id === skill.id)) {
+    if (!user.favoriteSkills?.some((s) => s.id === skill.id)) {
       throw new NotFoundException('Навык уже удалён из избранного');
     }
 
