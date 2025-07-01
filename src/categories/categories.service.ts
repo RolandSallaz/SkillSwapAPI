@@ -1,10 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IsNull, Repository } from 'typeorm';
+import { Repository, IsNull } from 'typeorm';
 import { CreateCategoryDto } from './dto/create-category.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Category } from './entities/category.entity';
-import { Repository } from 'typeorm';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from './entities/category.entity';
 
@@ -35,7 +32,6 @@ export class CategoriesService {
     return `This action returns a #${id} category`;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   update(id: number, updateCategoryDto: UpdateCategoryDto) {
     return `This action updates a #${id} category: ${updateCategoryDto?.name}`;
   }

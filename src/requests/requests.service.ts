@@ -1,11 +1,12 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Request } from 'src/requests/entities/request.entity';
+import { Skill } from 'src/skills/entities/skill.entity';
+import { User } from 'src/users/entities/users.entity';
+import { Repository } from 'typeorm';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { UpdateRequestDto } from './dto/update-request.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { User } from 'src/users/entities/users.entity';
-import { Skill } from 'src/skills/entities/skill.entity';
-import { Request } from 'src/requests/entities/request.entity';
+import { RequestAction, RequestStatus } from './enums';
 
 @Injectable()
 export class RequestsService {
@@ -87,48 +88,54 @@ export class RequestsService {
     return `This action returns a #${id} request`;
   }
 
-  async update(id: string, action: string) {
+  async update(id: string, dto: UpdateRequestDto) {
     const request = await this.requestRepository.findOneOrFail({
       where: { id },
       relations: ['sender', 'receiver', 'offeredSkill', 'requestedSkill'],
     });
+
+    const action = dto.action;
+
     switch (action) {
-      case 'read':
+      case RequestAction.READ: {
         request.isRead = true;
         break;
-      case 'accept':
+      }
+
+      case RequestAction.ACCEPT: {
         request.status = RequestStatus.ACCEPTED;
-        //добавляем навыки пользователям, если их еще у пользователей нет
-        if (
-          !request.sender.favoriteSkills.some(
-            (skill) => skill.id === request.requestedSkill.id,
-          )
-        ) {
-          request.sender.favoriteSkills.push(request.requestedSkill);
-          await this.usersService.updateUser(request.sender.id, {
-            favoriteSkills: request.sender.favoriteSkills,
-          });
-        }
-        if (
-          !request.receiver.favoriteSkills.some(
-            (skill) => skill.id === request.offeredSkill.id,
-          )
-        ) {
-          request.receiver.favoriteSkills.push(request.offeredSkill);
-          await this.usersService.updateUser(request.receiver.id, {
-            favoriteSkills: request.receiver.favoriteSkills,
-          });
+        const { sender, receiver, offeredSkill, requestedSkill } = request;
+
+        const senderHasRequested = sender.skills?.some(
+          (s) => s.id === requestedSkill.id,
+        );
+        if (!senderHasRequested) {
+          sender.skills = [...(sender.skills || []), requestedSkill];
+          await this.userRepository.save(sender);
         }
 
-        break;
-      case 'reject':
-        if (request.status === RequestStatus.PENDING) {
-          request.status = RequestStatus.REJECTED;
-        } else {
-          request.status = RequestStatus.PENDING;
+        const receiverHasOffered = receiver.skills?.some(
+          (s) => s.id === offeredSkill.id,
+        );
+        if (!receiverHasOffered) {
+          receiver.skills = [...(receiver.skills || []), offeredSkill];
+          await this.userRepository.save(receiver);
         }
         break;
+      }
+
+      case RequestAction.REJECT: {
+        request.status =
+          request.status === RequestStatus.PENDING
+            ? RequestStatus.REJECTED
+            : RequestStatus.PENDING;
+        break;
+      }
+
+      default:
+        throw new BadRequestException('Неверное действие');
     }
+
     return await this.requestRepository.save(request);
   }
 

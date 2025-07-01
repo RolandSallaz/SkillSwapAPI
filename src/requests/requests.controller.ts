@@ -11,9 +11,9 @@ import {
 } from '@nestjs/common';
 import { RequestsService } from './requests.service';
 import { CreateRequestDto } from './dto/create-request.dto';
-import { UpdateRequestDto } from './dto/update-request.dto';
 import { AccessTokenGuard } from 'src/auth/guards/accessToken.guard';
 import { AuthRequest } from 'src/auth/types';
+import { UpdateRequestDto } from './dto/update-request.dto';
 
 @Controller('requests')
 export class RequestsController {
@@ -32,37 +32,17 @@ export class RequestsController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.requestsService.findOne(+id);
+    return this.requestsService.findOne(id);
   }
 
+  @UseGuards(AccessTokenGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRequestDto: UpdateRequestDto) {
-    return this.requestsService.update(+id, updateRequestDto);
-  }
-
-  // прочитать заявку
-  @UseGuards(AccessTokenGuard)
-  @Patch(':id/read')
-  read(@Param('id') id: string) {
-    return this.requestsService.update(id, 'read');
-  }
-
-  // принять заявку
-  @UseGuards(AccessTokenGuard)
-  @Patch(':id/accept')
-  accept(@Param('id') id: string) {
-    return this.requestsService.update(id, 'accept');
-  }
-
-  // отклонить заявку
-  @UseGuards(AccessTokenGuard)
-  @Patch(':id/reject')
-  reject(@Param('id') id: string) {
-    return this.requestsService.update(id, 'reject');
+  read(@Param('id') id: string, @Body() updateDto: UpdateRequestDto) {
+    return this.requestsService.update(id, updateDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.requestsService.remove(+id);
+    return this.requestsService.remove(id);
   }
 }
