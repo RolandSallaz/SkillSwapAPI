@@ -24,11 +24,14 @@ export class RequestsService {
   async create(senderID: string, createRequestDto: CreateRequestDto) {
     const { offeredSkillId, requestedSkillId } = createRequestDto;
 
-    const offeredSkill = await this.skillRepository.findOneBy({
-      id: offeredSkillId,
+    const offeredSkill = await this.skillRepository.findOne({
+      where: { id: offeredSkillId },
+      relations: ['owner'],
     });
-    const requestedSkill = await this.skillRepository.findOneBy({
-      id: requestedSkillId,
+
+    const requestedSkill = await this.skillRepository.findOne({
+      where: { id: requestedSkillId },
+      relations: ['owner'],
     });
 
     if (offeredSkill == null || requestedSkill == null)
@@ -43,8 +46,14 @@ export class RequestsService {
       throw new ForbiddenException(
         `Заявка сгенерирована не от имени авторизированного пользователя`,
       );
-    const sender = await this.userRepository.findOneBy({ id: senderId });
-    const receiver = await this.userRepository.findOneBy({ id: receiverId });
+    const sender = await this.userRepository.findOne({
+      where: { id: senderId },
+      relations: ['skills'],
+    });
+    const receiver = await this.userRepository.findOne({
+      where: { id: receiverId },
+      relations: ['skills'],
+    });
     if (sender == null)
       throw new BadRequestException(
         `Заявка сгенерирована  несуществующим пользователем`,
