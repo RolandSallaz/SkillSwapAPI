@@ -5,7 +5,6 @@ dotenv.config();
 
 export const configuration = () => ({
   port: Number(process.env.PORT) || 3000,
-  wsPort: Number(process.env.WS_PORT) || 4002,
   nodeEnv: process.env.NODE_ENV || 'development',
   jwt: {
     accessTokenSecretExpiresIn: process.env.JWT_ACCESS_EXPIRES_IN || '1h',
