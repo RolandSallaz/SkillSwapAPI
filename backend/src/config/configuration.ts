@@ -5,6 +5,7 @@ dotenv.config();
 
 export const configuration = () => ({
   port: Number(process.env.PORT) || 3000,
+  wsPort: Number(process.env.WS_PORT) || 4002,
   nodeEnv: process.env.NODE_ENV || 'development',
   jwt: {
     accessTokenSecretExpiresIn: process.env.JWT_ACCESS_EXPIRES_IN || '1h',
@@ -41,7 +42,7 @@ export const commonDataSource: DataSourceOptions = {
   name: 'default',
   type: 'postgres',
   host: process.env.DATABASE_HOST || 'localhost',
-  port: parseInt(process.env.INTERIOR_DATABASE_PORT ?? '5432'),
+  port: parseInt(process.env.EXTERNAL_DATABASE_PORT ?? '5432'),
   username: process.env.DATABASE_USER || 'postgres',
   password: process.env.DATABASE_PASSWORD || 'postgres',
   database: process.env.DATABASE_NAME || 'skillswap',
