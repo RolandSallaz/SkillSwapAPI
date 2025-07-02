@@ -7,6 +7,8 @@ import { Repository } from 'typeorm';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { UpdateRequestDto } from './dto/update-request.dto';
 import { RequestAction, RequestStatus } from './enums';
+import { NotificationsGateway } from '../notifications/notifications.gateway';
+import { NotificationType } from '../notifications/ws-jwt/types';
 
 @Injectable()
 export class RequestsService {
@@ -14,6 +16,7 @@ export class RequestsService {
     @InjectRepository(Request) private requestRepository: Repository<Request>,
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Skill) private skillRepository: Repository<Skill>,
+    private notificationsGateway: NotificationsGateway,
   ) {}
 
   async create(senderID: string, createRequestDto: CreateRequestDto) {
@@ -77,7 +80,13 @@ export class RequestsService {
     newRequest.offeredSkill = offeredSkill;
     newRequest.requestedSkill = requestedSkill;
 
-    return await this.requestRepository.save(newRequest);
+    const createdRequest = await this.requestRepository.save(newRequest);
+    this.notificationsGateway.notifyUser(createdRequest.receiver.id!, {
+      type: NotificationType.NEW_REQUEST,
+      skillName: createdRequest.requestedSkill.title,
+      sender: createdRequest.sender.name,
+    });
+    return createdRequest;
   }
 
   findAll() {
