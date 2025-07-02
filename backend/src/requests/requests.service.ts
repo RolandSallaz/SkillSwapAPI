@@ -145,7 +145,23 @@ export class RequestsService {
         throw new BadRequestException('Неверное действие');
     }
 
-    return await this.requestRepository.save(request);
+    const updatedRequest = await this.requestRepository.save(request);
+
+    const requestToNotificationMap = {
+      [RequestAction.READ]: undefined,
+      [RequestAction.ACCEPT]: NotificationType.ACCEPTED_REQUEST,
+      [RequestAction.REJECT]: NotificationType.DECLINED_REQUEST,
+    };
+
+    const notificationType = requestToNotificationMap[action];
+    if (notificationType) {
+      this.notificationsGateway.notifyUser(updatedRequest.receiver.id!, {
+        type: notificationType,
+        skillName: updatedRequest.requestedSkill.title,
+        sender: updatedRequest.sender.name,
+      });
+    }
+    return updatedRequest;
   }
 
   remove(id: string) {
