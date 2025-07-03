@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Request } from 'src/requests/entities/request.entity';
 import { Skill } from 'src/skills/entities/skill.entity';
@@ -7,6 +11,7 @@ import { Repository } from 'typeorm';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { UpdateRequestDto } from './dto/update-request.dto';
 import { RequestAction, RequestStatus } from './enums';
+import { JwtPayload } from '../auth/types';
 
 @Injectable()
 export class RequestsService {
@@ -139,7 +144,18 @@ export class RequestsService {
     return await this.requestRepository.save(request);
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} request`;
+  async remove(id: string, user: JwtPayload) {
+    const request = await this.requestRepository.findOneOrFail({
+      where: { id },
+      relations: ['sender'], //sender(пользователь создавший заявку),
+    });
+
+    if (user.role === 'user' && user.sub !== request.sender.id) {
+      throw new ForbiddenException(
+        `Пользователь не может удалить заявку, созданную другим пользователем`,
+      );
+    }
+    await this.requestRepository.delete(id);
+    return { message: `Заявка с id: ${id} успешно удалена` };
   }
 }
