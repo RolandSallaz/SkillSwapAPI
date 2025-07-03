@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Request } from 'src/requests/entities/request.entity';
 import { Skill } from 'src/skills/entities/skill.entity';
@@ -6,7 +10,7 @@ import { User } from 'src/users/entities/users.entity';
 import { Repository } from 'typeorm';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { UpdateRequestDto } from './dto/update-request.dto';
-import { RequestAction, RequestStatus } from './enums';
+import { RequestAction, RequestStatus, RequestType } from './enums';
 
 @Injectable()
 export class RequestsService {
@@ -80,8 +84,54 @@ export class RequestsService {
     return await this.requestRepository.save(newRequest);
   }
 
-  findAll() {
-    return `This action returns all requests`;
+  async findAll(query: {
+    type?: RequestType;
+    status?: RequestStatus;
+    isRead?: boolean;
+    page?: string;
+    limit?: string;
+  }) {
+    const page = Math.max(parseInt(query.page ?? '1'), 1);
+    const limit = Math.min(Math.max(parseInt(query.limit ?? '20'), 1), 100);
+
+    const qb = this.requestRepository
+      .createQueryBuilder('request')
+      .leftJoinAndSelect('request.sender', 'sender')
+      .leftJoinAndSelect('request.receiver', 'receiver')
+      .leftJoinAndSelect('request.offeredSkill', 'offeredSkill')
+      .leftJoinAndSelect('request.requestedSkill', 'requestedSkill')
+      .orderBy('request.createdAt', 'DESC');
+
+    if (query.type) {
+      qb.andWhere('request.type = :type', { type: query.type });
+    }
+
+    if (query.status) {
+      qb.andWhere('request.status = :status', { status: query.status });
+    }
+
+    if (query.isRead !== undefined && query.isRead !== null) {
+      qb.andWhere('request.isRead = :isRead', { isRead: query.isRead });
+    }
+
+    const [requests, total] = await qb
+      .skip((page - 1) * limit)
+      .take(limit)
+      .getManyAndCount();
+
+    const totalPages = Math.ceil(total / limit);
+
+    if (page > totalPages && totalPages !== 0) {
+      throw new NotFoundException('Страница не найдена');
+    }
+
+    return {
+      data: requests,
+      page,
+      limit,
+      totalPages,
+      total,
+    };
   }
 
   findOne(id: string) {
