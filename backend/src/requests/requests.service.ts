@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -55,12 +56,12 @@ export class RequestsService {
       relations: ['skills'],
     });
     if (sender == null)
-      throw new BadRequestException(
+      throw new NotFoundException(
         `Заявка сгенерирована  несуществующим пользователем`,
       );
 
     if (receiver == null)
-      throw new BadRequestException(
+      throw new NotFoundException(
         `Заявка адресована  несуществующему пользователю`,
       );
 
@@ -69,7 +70,7 @@ export class RequestsService {
     );
 
     if (!senderHasOfferedSkill) {
-      throw new BadRequestException(
+      throw new ForbiddenException(
         `Авторизированный пользователь не обладает предлагаемым навыком.`,
       );
     }
@@ -79,7 +80,7 @@ export class RequestsService {
     );
 
     if (!receiverHasRequestedSkill) {
-      throw new BadRequestException(
+      throw new ConflictException(
         `Получатель не обладает запрашиваемым навыком.`,
       );
     }
