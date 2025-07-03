@@ -34,6 +34,7 @@ export class CategoriesController {
     return this.categoriesService.findOne(id);
   }
 
+  // @UseGuards(AccessTokenGuard, RoleGuard)
   // @Patch(':id')
   // update(
   //   @Param('id') id: string,
