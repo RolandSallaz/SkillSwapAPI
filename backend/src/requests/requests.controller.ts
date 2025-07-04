@@ -8,12 +8,15 @@ import {
   Delete,
   Req,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { RequestsService } from './requests.service';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { AccessTokenGuard } from 'src/auth/guards/accessToken.guard';
 import { AuthRequest } from 'src/auth/types';
 import { UpdateRequestDto } from './dto/update-request.dto';
+import { FindSkillsQueryDto } from 'src/skills/dto/find-skill.dto';
+import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller('requests')
 export class RequestsController {
@@ -26,8 +29,15 @@ export class RequestsController {
   }
 
   @Get()
-  findAll() {
-    return this.requestsService.findAll();
+  @ApiOperation({ summary: 'Получение всех  запросов' })
+  @ApiResponse({
+    status: 200,
+    description: 'Список всех запросов',
+    type: Request,
+    isArray: true,
+  })
+  findAll(@Query() query: FindSkillsQueryDto) {
+    return this.requestsService.findAll(query);
   }
 
   @Get(':id')
